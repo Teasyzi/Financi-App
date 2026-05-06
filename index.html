@@ -34,6 +34,7 @@
         <button class="ghost-btn" id="importBtn" type="button">Importar</button>
         <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
         <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
+        <button class="ghost-btn" id="openGroupBtn" type="button">Grupo</button>
         <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
       </div>
     </header>
@@ -112,18 +113,25 @@
         </section>
 
 
-        <section class="card section-card share-card">
-          <span class="eyebrow">Controle compartilhado</span>
-          <h2>Casal / família</h2>
-          <p>Crie um convite para outra conta Google entrar no mesmo controle financeiro.</p>
-          <div class="share-actions">
-            <button class="primary-btn" id="createInviteBtn" type="button">Criar convite</button>
-            <button class="ghost-btn" id="copyInviteBtn" type="button">Copiar link</button>
+        <section class="card section-card share-card" id="familyCard">
+          <span class="eyebrow">Grupo financeiro</span>
+          <h2 id="familyCardTitle">Casal / família</h2>
+          <p id="familyCardText">Entre ou convide alguém para compartilhar o mesmo controle financeiro.</p>
+          <div id="familyMiniMembers" class="family-mini-members"></div>
+          <div id="familyInviteArea">
+            <div class="share-actions">
+              <button class="primary-btn" id="createInviteBtn" type="button">Criar convite</button>
+              <button class="ghost-btn" id="copyInviteBtn" type="button">Copiar link</button>
+            </div>
+            <label class="field full"><span>Link ou código de convite</span><input id="inviteOutput" type="text" placeholder="Nenhum convite criado ainda" readonly /></label>
+            <div class="join-box">
+              <label class="field full"><span>Entrar em um controle existente</span><input id="joinCode" type="text" placeholder="Cole o código ou link recebido" /></label>
+              <button class="ghost-btn" id="joinInviteBtn" type="button">Entrar pelo convite</button>
+            </div>
           </div>
-          <label class="field full"><span>Link ou código de convite</span><input id="inviteOutput" type="text" placeholder="Nenhum convite criado ainda" readonly /></label>
-          <div class="join-box">
-            <label class="field full"><span>Entrar em um controle existente</span><input id="joinCode" type="text" placeholder="Cole o código ou link recebido" /></label>
-            <button class="ghost-btn" id="joinInviteBtn" type="button">Entrar pelo convite</button>
+          <div id="familyLinkedArea" class="hidden family-linked-area">
+            <button class="ghost-btn" id="openGroupCardBtn" type="button">Ver grupo</button>
+            <button class="danger-btn" id="leaveGroupBtn" type="button">Sair deste grupo</button>
           </div>
           <small id="shareStatus">Você pode usar contas Google diferentes no mesmo app.</small>
         </section>
@@ -137,6 +145,20 @@
     </main>
   </div>
 
+  <dialog id="groupDialog" class="modal">
+    <div class="modal-card small group-modal-card">
+      <div class="modal-head">
+        <div><span class="eyebrow">Grupo / família</span><h2>Controle compartilhado</h2></div>
+        <button class="icon-btn" type="button" id="closeGroupBtn">×</button>
+      </div>
+      <div id="groupDetails" class="group-details"></div>
+      <div class="modal-actions group-actions">
+        <button class="ghost-btn" type="button" id="createInviteModalBtn">Gerar convite</button>
+        <button class="ghost-btn" type="button" id="copyInviteModalBtn">Copiar convite</button>
+        <button class="danger-btn" type="button" id="leaveGroupModalBtn">Sair do grupo</button>
+      </div>
+    </div>
+  </dialog>
 
   <dialog id="profileDialog" class="modal">
     <form id="profileForm" method="dialog" class="modal-card small profile-modal-card">

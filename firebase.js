@@ -13,7 +13,8 @@ import {
   getDoc,
   setDoc,
   updateDoc,
-  serverTimestamp
+  serverTimestamp,
+  deleteField
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -203,4 +204,53 @@ export async function carregarMembrosWorkspace(workspaceId) {
   }
 
   return members;
+}
+
+
+export async function carregarGrupoWorkspace(workspaceId) {
+  if (!workspaceId) return null;
+  const snap = await getDoc(doc(db, "financeGroups", workspaceId));
+  if (!snap.exists()) return null;
+  return { id: workspaceId, ...snap.data() };
+}
+
+export async function sairDoWorkspaceAtual(user, workspaceId) {
+  if (!user || !workspaceId) throw new Error("Usuário ou grupo não encontrado.");
+
+  const groupRef = doc(db, "financeGroups", workspaceId);
+  const groupSnap = await getDoc(groupRef);
+  if (groupSnap.exists()) {
+    const group = groupSnap.data();
+    const members = Object.keys(group.members || {}).filter(uid => uid !== user.uid);
+    const patch = {
+      [`members.${user.uid}`]: deleteField(),
+      [`memberEmails.${user.uid}`]: deleteField(),
+      updatedAt: serverTimestamp()
+    };
+    if (group.ownerUid === user.uid && members.length) {
+      patch.ownerUid = members[0];
+    }
+    await updateDoc(groupRef, patch);
+  }
+
+  const newWorkspaceId = novoId("finance");
+  await setDoc(doc(db, "financeGroups", newWorkspaceId), {
+    name: "Meu controle financeiro",
+    ownerUid: user.uid,
+    members: { [user.uid]: true },
+    memberEmails: { [user.uid]: user.email || "" },
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  });
+
+  await setDoc(doc(db, "users", user.uid), {
+    uid: user.uid,
+    name: user.displayName || "",
+    email: user.email || "",
+    photoURL: user.photoURL || "",
+    currentWorkspaceId: newWorkspaceId,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+
+  return newWorkspaceId;
 }

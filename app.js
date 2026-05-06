@@ -10,7 +10,9 @@ import {
   extrairCodigoConvite,
   carregarPerfilUsuario,
   salvarPerfilUsuario,
-  carregarMembrosWorkspace
+  carregarMembrosWorkspace,
+  carregarGrupoWorkspace,
+  sairDoWorkspaceAtual
 } from "./firebase.js";
 
 const $ = (id) => document.getElementById(id);
@@ -35,6 +37,7 @@ let isCloudReady = false;
 let saveTimer = null;
 let currentProfile = null;
 let workspaceMembers = [];
+let currentGroup = null;
 
 function defaultSalary(){return{name:'',gross:0,useINSS:true,showFGTS:true,useTransport:false,useFood:false,foodMode:'value',foodValue:0,useHealth:false,healthMode:'value',healthValue:0}}
 function defaultState(){return{version:7,accounts:[],paid:{},salary:{...defaultSalary(),manualExtra:0,useSecondSalary:false,second:{...defaultSalary()}}}}
@@ -84,7 +87,7 @@ async function initAuth(){
     catch(err){$('authStatus').textContent='Não foi possível entrar com Google.';console.error(err)}
   });
   observarLogin(async(user)=>{
-    if(!user){currentUser=null;currentProfile=null;workspaceMembers=[];workspaceId=null;isCloudReady=false;showLoggedOut();return;}
+    if(!user){currentUser=null;currentProfile=null;workspaceMembers=[];currentGroup=null;workspaceId=null;isCloudReady=false;showLoggedOut();return;}
     try{
       currentUser=user;currentProfile=await carregarPerfilUsuario(user.uid);applyProfileTheme();showLoggedIn(user);setCloudStatus('Conectando ao Firebase...');
       workspaceId=await garantirWorkspace(user);
@@ -98,6 +101,7 @@ async function initAuth(){
         await salvarDadosWorkspace(workspaceId,state);
       }
       isCloudReady=true;
+      currentGroup=await carregarGrupoWorkspace(workspaceId).catch(()=>null);
       workspaceMembers=await carregarMembrosWorkspace(workspaceId).catch(()=>[]);
       renderUserChip();
       setCloudStatus('Sincronização ativa. Compartilhe por convite para usar em casal.');
@@ -176,7 +180,7 @@ function render(){
   $('riskText').textContent=risk.text;
   $('riskBar').style.width=`${Math.min(100,Math.round(commitment))}%`;
   $('riskBar').className=risk.cls;
-  renderFilters();renderCalendar(allPayments);renderBills(payments);renderInterest();renderMonthGrid();
+  renderFilters();renderCalendar(allPayments);renderBills(payments);renderInterest();renderMonthGrid();renderFamilyPanel();
 }
 function renderCalendar(allPayments){
   const first=new Date(viewDate.getFullYear(),viewDate.getMonth(),1);
@@ -233,6 +237,75 @@ function setProfilePreview(photo,name,email){
   if(photo){img.src=photo;img.classList.remove('empty-avatar');img.alt=`Foto de ${safeName}`;}
   else{img.removeAttribute('src');img.classList.add('empty-avatar');img.alt='Sem foto';img.dataset.initial=avatarFallback(safeName,safeEmail);}
 }
+
+function memberDisplayName(m){return m?.nickname||m?.name||m?.email||'Membro'}
+function isFamilyLinked(){return (workspaceMembers||[]).length>1}
+function renderMemberRows(){
+  const members=workspaceMembers||[];
+  if(!members.length)return '<div class="empty small-empty">Nenhum membro carregado ainda.</div>';
+  return members.map(m=>{
+    const me=currentUser&&m.uid===currentUser.uid;
+    const owner=currentGroup&&m.uid===currentGroup.ownerUid;
+    const name=memberDisplayName(m);
+    return `<div class="member-row group-member-row">${m.photoURL?`<img src="${escapeHtml(m.photoURL)}" alt="">`:`<span>${escapeHtml(avatarFallback(name,m.email))}</span>`}<div><strong>${escapeHtml(name)} ${me?'<em>você</em>':''}</strong><small>${escapeHtml(m.email||'')}${owner?' • criou o grupo':''}</small></div></div>`;
+  }).join('');
+}
+function renderFamilyPanel(){
+  const linked=isFamilyLinked();
+  const inviteArea=$('familyInviteArea');
+  const linkedArea=$('familyLinkedArea');
+  if(inviteArea)inviteArea.classList.toggle('hidden',linked);
+  if(linkedArea)linkedArea.classList.toggle('hidden',!linked);
+  if($('familyCardTitle'))$('familyCardTitle').textContent=linked?'Seu grupo financeiro':'Casal / família';
+  if($('familyCardText'))$('familyCardText').textContent=linked?'Você está vinculado a um controle compartilhado. Os dados financeiros são sincronizados entre os membros.':'Crie ou cole um convite para compartilhar o mesmo controle financeiro.';
+  if($('familyMiniMembers'))$('familyMiniMembers').innerHTML=linked?renderMemberRows():'<div class="empty small-empty">Você ainda está em um controle individual.</div>';
+  if($('groupDetails')){
+    const groupName=currentGroup?.name||'Controle financeiro';
+    const invite=currentGroup?.lastInviteCode?inviteLinkFromCode(currentGroup.lastInviteCode):($('inviteOutput')?.value||'');
+    $('groupDetails').innerHTML=`<div class="group-summary"><span class="eyebrow">Nome do grupo</span><h3>${escapeHtml(groupName)}</h3><p>${linked?'Grupo compartilhado ativo.':'Controle individual. Convide seu cônjuge para compartilhar.'}</p></div><div class="group-members-list"><span class="eyebrow">Pessoas vinculadas</span>${renderMemberRows()}</div><label class="field full"><span>Último convite</span><input id="groupInviteMirror" type="text" readonly value="${escapeHtml(invite)}" placeholder="Nenhum convite criado ainda" /></label>`;
+  }
+}
+async function refreshGroupInfo(){
+  if(!workspaceId)return;
+  currentGroup=await carregarGrupoWorkspace(workspaceId).catch(()=>null);
+  workspaceMembers=await carregarMembrosWorkspace(workspaceId).catch(()=>[]);
+  renderFamilyPanel();renderProfileMembers();
+}
+async function createInviteFlow(){
+  if(!currentUser||!workspaceId)throw new Error('Faça login primeiro.');
+  const code=await criarConvite(workspaceId,currentUser);
+  const link=inviteLinkFromCode(code);
+  if($('inviteOutput'))$('inviteOutput').value=link;
+  await refreshGroupInfo();
+  if($('groupInviteMirror'))$('groupInviteMirror').value=link;
+  setCloudStatus(`Convite criado: ${code}`);
+  return link;
+}
+async function copyInviteFlow(){
+  let value=$('inviteOutput')?.value||$('groupInviteMirror')?.value||'';
+  if(!value&&currentGroup?.lastInviteCode)value=inviteLinkFromCode(currentGroup.lastInviteCode);
+  if(!value)value=await createInviteFlow();
+  try{await navigator.clipboard.writeText(value);setCloudStatus('Link copiado. Envie para quem entrará no grupo.');}
+  catch{setCloudStatus('Não consegui copiar automaticamente. Copie o campo manualmente.');}
+}
+async function leaveGroupFlow(){
+  if(!currentUser||!workspaceId)return setCloudStatus('Faça login primeiro.');
+  if(!confirm('Deseja sair deste grupo financeiro? Você irá para um controle individual novo.'))return;
+  try{
+    const oldId=workspaceId;
+    workspaceId=await sairDoWorkspaceAtual(currentUser,oldId);
+    const remote=await carregarDadosWorkspace(workspaceId);
+    state=remote&&Array.isArray(remote.accounts)?{...defaultState(),...remote,paid:remote.paid||{},salary:normalizeSalary(remote.salary||{})}:defaultState();
+    localStorage.setItem(STORE,JSON.stringify(state));
+    isCloudReady=true;
+    await refreshGroupInfo();
+    render();
+    setCloudStatus('Você saiu do grupo e agora está em um controle individual.');
+    if($('groupDialog')?.open)$('groupDialog').close();
+  }catch(err){console.error(err);setCloudStatus(err.message||'Não consegui sair do grupo.');}
+}
+function openGroup(){renderFamilyPanel();$('groupDialog')?.showModal();}
+
 function renderProfileMembers(){
   const box=$('profileMembers');
   if(!box)return;
@@ -282,7 +355,7 @@ async function saveProfile(e){
       compactMode:$('profileCompactMode').checked
     };
     currentProfile=await salvarPerfilUsuario(currentUser,profile);
-    workspaceMembers=await carregarMembrosWorkspace(workspaceId).catch(()=>workspaceMembers);
+    await refreshGroupInfo();
     applyProfileTheme();
     renderUserChip();
     $('profileDialog').close();
@@ -299,26 +372,13 @@ $('nextMonthBtn').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate
 $('monthPickerBtn').onclick=()=>$('monthPicker').classList.toggle('hidden');$('yearDownBtn').onclick=()=>{pickerYear--;renderMonthGrid()};$('yearUpBtn').onclick=()=>{pickerYear++;renderMonthGrid()};
 $('openAccountBtn').onclick=()=>openAccount();$('closeAccountBtn').onclick=closeAccount;$('cancelAccountBtn').onclick=closeAccount;$('accountForm').onsubmit=saveAccount;$('deleteAccountBtn').onclick=deleteAccount;
 $('openSettingsBtn').onclick=openSettings;$('closeSettingsBtn').onclick=()=>$('settingsDialog').close();$('cancelSettingsBtn').onclick=()=>$('settingsDialog').close();$('settingsForm').onsubmit=saveSettings;
-$('openProfileBtn')?.addEventListener('click',openProfile);$('closeProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('cancelProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('profileForm')?.addEventListener('submit',saveProfile);$('profilePhotoFile')?.addEventListener('change',async(e)=>{try{const url=await imageFileToDataUrl(e.target.files?.[0]);if(url)setProfilePreview(url,$('profileName').value,currentUser?.email)}catch(err){alert(err.message)}});$('profilePhotoUrl')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim(),$('profileName').value,currentUser?.email));$('profileName')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim()||currentProfile?.photoURL||currentUser?.photoURL,$('profileName').value,currentUser?.email));
+$('openProfileBtn')?.addEventListener('click',openProfile);$('openGroupBtn')?.addEventListener('click',openGroup);$('openGroupCardBtn')?.addEventListener('click',openGroup);$('closeGroupBtn')?.addEventListener('click',()=>$('groupDialog').close());$('createInviteModalBtn')?.addEventListener('click',async()=>{try{await createInviteFlow();renderFamilyPanel();}catch(err){console.error(err);setCloudStatus(err.message||'Erro ao criar convite.')}});$('copyInviteModalBtn')?.addEventListener('click',copyInviteFlow);$('leaveGroupBtn')?.addEventListener('click',leaveGroupFlow);$('leaveGroupModalBtn')?.addEventListener('click',leaveGroupFlow);$('closeProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('cancelProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('profileForm')?.addEventListener('submit',saveProfile);$('profilePhotoFile')?.addEventListener('change',async(e)=>{try{const url=await imageFileToDataUrl(e.target.files?.[0]);if(url)setProfilePreview(url,$('profileName').value,currentUser?.email)}catch(err){alert(err.message)}});$('profilePhotoUrl')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim(),$('profileName').value,currentUser?.email));$('profileName')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim()||currentProfile?.photoURL||currentUser?.photoURL,$('profileName').value,currentUser?.email));
 $('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>importData(e.target.files[0]);
 ['accountType','purchaseDate','firstPaymentDate','installments','installmentValue','fixedValue','cashValue','hasDifferentFirst','firstInstallmentValue','category'].forEach(id=>$(id).addEventListener('input',updateSmartForm));
 ['grossSalary','salaryName1','manualBalance','useSecondSalary','useINSS','showFGTS','useTransport','useFood','foodMode','foodValue','useHealth','healthMode','healthValue','grossSalary2','salaryName2','useINSS2','showFGTS2','useTransport2','useFood2','foodMode2','foodValue2','useHealth2','healthMode2','healthValue2'].forEach(id=>$(id).addEventListener('input',updateSalaryPreview));
 $('logoutBtn')?.addEventListener('click',()=>sairDoGoogle());
-$('createInviteBtn')?.addEventListener('click',async()=>{
-  try{
-    if(!currentUser||!workspaceId)throw new Error('Faça login primeiro.');
-    const code=await criarConvite(workspaceId,currentUser);
-    const link=inviteLinkFromCode(code);
-    $('inviteOutput').value=link;
-    setCloudStatus(`Convite criado: ${code}`);
-  }catch(err){console.error(err);setCloudStatus(err.message||'Erro ao criar convite.')}
-});
-$('copyInviteBtn')?.addEventListener('click',async()=>{
-  const value=$('inviteOutput')?.value;
-  if(!value)return setCloudStatus('Crie um convite primeiro.');
-  try{await navigator.clipboard.writeText(value);setCloudStatus('Link copiado. Envie para seu cônjuge.')}
-  catch{setCloudStatus('Não consegui copiar automaticamente. Copie o campo manualmente.')}
-});
+$('createInviteBtn')?.addEventListener('click',async()=>{try{await createInviteFlow();}catch(err){console.error(err);setCloudStatus(err.message||'Erro ao criar convite.')}});
+$('copyInviteBtn')?.addEventListener('click',copyInviteFlow);
 $('joinInviteBtn')?.addEventListener('click',async()=>{
   try{
     if(!currentUser)throw new Error('Faça login primeiro.');
@@ -327,7 +387,7 @@ $('joinInviteBtn')?.addEventListener('click',async()=>{
     workspaceId=await entrarPorConvite(code,currentUser);
     const remote=await carregarDadosWorkspace(workspaceId);
     if(remote&&Array.isArray(remote.accounts)){state={...defaultState(),...remote,paid:remote.paid||{},salary:normalizeSalary(remote.salary||{})};localStorage.setItem(STORE,JSON.stringify(state));}
-    isCloudReady=true;workspaceMembers=await carregarMembrosWorkspace(workspaceId).catch(()=>[]);render();setCloudStatus('Você entrou no controle compartilhado com sucesso.');
+    isCloudReady=true;await refreshGroupInfo();render();setCloudStatus('Você entrou no controle compartilhado com sucesso.');
   }catch(err){console.error(err);setCloudStatus(err.message||'Não consegui entrar pelo convite.')}
 });
 
