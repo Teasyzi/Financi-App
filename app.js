@@ -1,9 +1,21 @@
+import {
+  observarLogin,
+  entrarComGoogle,
+  sairDoGoogle,
+  garantirWorkspace,
+  carregarDadosWorkspace,
+  salvarDadosWorkspace,
+  criarConvite,
+  entrarPorConvite,
+  extrairCodigoConvite
+} from "./firebase.js";
+
 const $ = (id) => document.getElementById(id);
 const MONTHS = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const CATEGORIES = ['Cartão','Financiamento','Empréstimo','Assinatura','Casa','Mercado','Veículo','Saúde','Educação','Outros'];
-const STORE = 'financi-app-v43';
-const PREVIOUS = 'financi-app-v42';
-const LEGACY = 'financi-app-v40';
+const STORE = 'financi-app-v50';
+const PREVIOUS = 'financi-app-v43';
+const LEGACY = 'financi-app-v42';
 const INSS_2026 = [
   { limit: 1621.00, rate: 0.075 },
   { limit: 2902.84, rate: 0.09 },
@@ -14,12 +26,67 @@ let state = loadState();
 let viewDate = new Date(); viewDate.setDate(1);
 let pickerYear = viewDate.getFullYear();
 let activeCategory = 'Todas';
+let currentUser = null;
+let workspaceId = null;
+let isCloudReady = false;
+let saveTimer = null;
 
 function defaultSalary(){return{name:'',gross:0,useINSS:true,showFGTS:true,useTransport:false,useFood:false,foodMode:'value',foodValue:0,useHealth:false,healthMode:'value',healthValue:0}}
 function defaultState(){return{version:6,accounts:[],paid:{},salary:{...defaultSalary(),manualExtra:0,useSecondSalary:false,second:{...defaultSalary()}}}}
 function normalizeSalary(raw={}){const base={...defaultSalary(),...raw};return{...base,manualExtra:toNumber(raw.manualExtra),useSecondSalary:!!raw.useSecondSalary,second:{...defaultSalary(),...(raw.second||{})}}}
 function loadState(){try{const raw=localStorage.getItem(STORE)||localStorage.getItem(PREVIOUS)||localStorage.getItem(LEGACY)||localStorage.getItem('financi-app-v31');const data=raw?JSON.parse(raw):defaultState();return{...defaultState(),...data,paid:data.paid||{},salary:normalizeSalary(data.salary||{})}}catch{return defaultState()}}
-function saveState(){localStorage.setItem(STORE,JSON.stringify(state))}
+function saveState(){
+  localStorage.setItem(STORE,JSON.stringify(state));
+  if(isCloudReady && workspaceId){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>{
+      salvarDadosWorkspace(workspaceId,state).catch(err=>console.error('Erro ao salvar no Firebase:',err));
+    },450);
+  }
+}
+function setCloudStatus(text){const el=$('shareStatus');if(el)el.textContent=text}
+function showLoggedOut(){
+  $('authScreen')?.classList.remove('hidden');
+  $('appShell')?.classList.add('hidden');
+}
+function showLoggedIn(user){
+  $('authScreen')?.classList.add('hidden');
+  $('appShell')?.classList.remove('hidden');
+  if($('userChip'))$('userChip').textContent=user?.displayName||user?.email||'Logado';
+}
+function inviteLinkFromCode(code){return `${location.origin}${location.pathname}?convite=${encodeURIComponent(code)}`}
+async function initAuth(){
+  $('googleLoginBtn')?.addEventListener('click',async()=>{
+    try{$('authStatus').textContent='Abrindo Google...';await entrarComGoogle();}
+    catch(err){$('authStatus').textContent='Não foi possível entrar com Google.';console.error(err)}
+  });
+  observarLogin(async(user)=>{
+    if(!user){currentUser=null;workspaceId=null;isCloudReady=false;showLoggedOut();return;}
+    try{
+      currentUser=user;showLoggedIn(user);setCloudStatus('Conectando ao Firebase...');
+      workspaceId=await garantirWorkspace(user);
+      const urlCode=new URLSearchParams(location.search).get('convite');
+      if(urlCode){workspaceId=await entrarPorConvite(urlCode,user);history.replaceState({},'',location.pathname);}
+      const remote=await carregarDadosWorkspace(workspaceId);
+      if(remote && Array.isArray(remote.accounts)){
+        state={...defaultState(),...remote,paid:remote.paid||{},salary:normalizeSalary(remote.salary||{})};
+        localStorage.setItem(STORE,JSON.stringify(state));
+      }else{
+        await salvarDadosWorkspace(workspaceId,state);
+      }
+      isCloudReady=true;
+      setCloudStatus('Sincronização ativa. Compartilhe por convite para usar em casal.');
+      render();
+    }catch(err){
+      console.error(err);
+      isCloudReady=false;
+      showLoggedIn(user);
+      setCloudStatus('Login feito, mas houve erro ao acessar o Firestore. Verifique as regras.');
+      render();
+    }
+  });
+}
+
 function toNumber(v){const n=Number(String(v||'').replace(',','.'));return Number.isFinite(n)?n:0}
 function money(v){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
 function iso(d){return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)}
@@ -142,5 +209,34 @@ $('openSettingsBtn').onclick=openSettings;$('closeSettingsBtn').onclick=()=>$('s
 $('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>importData(e.target.files[0]);
 ['accountType','purchaseDate','firstPaymentDate','installments','installmentValue','fixedValue','cashValue','hasDifferentFirst','firstInstallmentValue','category'].forEach(id=>$(id).addEventListener('input',updateSmartForm));
 ['grossSalary','salaryName1','manualBalance','useSecondSalary','useINSS','showFGTS','useTransport','useFood','foodMode','foodValue','useHealth','healthMode','healthValue','grossSalary2','salaryName2','useINSS2','showFGTS2','useTransport2','useFood2','foodMode2','foodValue2','useHealth2','healthMode2','healthValue2'].forEach(id=>$(id).addEventListener('input',updateSalaryPreview));
+$('logoutBtn')?.addEventListener('click',()=>sairDoGoogle());
+$('createInviteBtn')?.addEventListener('click',async()=>{
+  try{
+    if(!currentUser||!workspaceId)throw new Error('Faça login primeiro.');
+    const code=await criarConvite(workspaceId,currentUser);
+    const link=inviteLinkFromCode(code);
+    $('inviteOutput').value=link;
+    setCloudStatus(`Convite criado: ${code}`);
+  }catch(err){console.error(err);setCloudStatus(err.message||'Erro ao criar convite.')}
+});
+$('copyInviteBtn')?.addEventListener('click',async()=>{
+  const value=$('inviteOutput')?.value;
+  if(!value)return setCloudStatus('Crie um convite primeiro.');
+  try{await navigator.clipboard.writeText(value);setCloudStatus('Link copiado. Envie para seu cônjuge.')}
+  catch{setCloudStatus('Não consegui copiar automaticamente. Copie o campo manualmente.')}
+});
+$('joinInviteBtn')?.addEventListener('click',async()=>{
+  try{
+    if(!currentUser)throw new Error('Faça login primeiro.');
+    const code=extrairCodigoConvite($('joinCode').value);
+    if(!code)throw new Error('Cole um código ou link de convite.');
+    workspaceId=await entrarPorConvite(code,currentUser);
+    const remote=await carregarDadosWorkspace(workspaceId);
+    if(remote&&Array.isArray(remote.accounts)){state={...defaultState(),...remote,paid:remote.paid||{},salary:normalizeSalary(remote.salary||{})};localStorage.setItem(STORE,JSON.stringify(state));}
+    isCloudReady=true;render();setCloudStatus('Você entrou no controle compartilhado com sucesso.');
+  }catch(err){console.error(err);setCloudStatus(err.message||'Não consegui entrar pelo convite.')}
+});
+
 if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
-render();
+showLoggedOut();
+initAuth();
