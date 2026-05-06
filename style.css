@@ -86,3 +86,283 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
 }
 
 @media(max-width:390px){.clean-actions{grid-template-columns:1fr auto auto!important}.clean-actions #toggleValuesBtn{grid-column:2/4}.menu-wrap{grid-column:4/5}.summary-grid,.summary-grid-five{grid-template-columns:1fr!important}.topbar>div:first-child{display:none}.topbar{padding-top:8px}.month-display small{display:none}}
+
+
+/* =========================================================
+   FINANCI APP V6.3 — RESPONSIVIDADE MOBILE + HEADER CLEAN
+========================================================= */
+
+:root {
+  --financi-bg: #020617;
+  --financi-card: rgba(15, 23, 42, 0.82);
+  --financi-border: rgba(255, 255, 255, 0.09);
+  --financi-text: #f8fafc;
+  --financi-muted: #94a3b8;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(21, 128, 61, 0.55) 0%, rgba(6, 78, 59, 0.32) 20%, rgba(2, 6, 23, 0.96) 52%),
+    linear-gradient(180deg, #020617 0%, #020617 100%) !important;
+  color: var(--financi-text);
+}
+
+header,
+.app-header,
+.hero,
+.hero-section,
+.header,
+.top-header,
+.brand,
+.brand-area,
+.logo-area,
+.page-hero {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-header,
+.hero-section,
+.hero {
+  width: 100%;
+  padding: clamp(22px, 5vw, 44px) clamp(16px, 4vw, 36px) 22px;
+  border: 0;
+}
+
+.logo-title,
+.brand-title,
+.app-title,
+.hero-title,
+h1 {
+  max-width: 100%;
+  color: #f8fafc;
+  font-size: clamp(3rem, 10vw, 5.7rem);
+  line-height: 0.92;
+  letter-spacing: clamp(-4px, -0.7vw, -2px);
+  font-weight: 850;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.subtitle,
+.app-subtitle,
+.brand-subtitle,
+.hero-subtitle {
+  color: #94a3b8;
+  font-size: clamp(0.68rem, 2.5vw, 0.82rem);
+  letter-spacing: clamp(2px, 0.7vw, 5px);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.card,
+.panel,
+.widget,
+.account-card,
+.goal-card,
+.history-card,
+.insight-card,
+.stat-card {
+  background: rgba(15, 23, 42, 0.78) !important;
+  border: 1px solid var(--financi-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--financi-text);
+}
+
+.card *,
+.panel *,
+.widget *,
+.account-card *,
+.goal-card *,
+.history-card *,
+.insight-card *,
+.stat-card * {
+  color: inherit;
+}
+
+.mobile-menu-button,
+.menu-toggle,
+.hamburger,
+#menuToggle,
+button[aria-label="Menu"] {
+  min-width: 46px;
+  min-height: 46px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  color: #fff !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .app,
+  .container,
+  .dashboard,
+  .main-content,
+  main,
+  .content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .app-header,
+  .hero-section,
+  .hero {
+    padding: 24px 14px 18px !important;
+  }
+
+  .logo-title,
+  .brand-title,
+  .app-title,
+  .hero-title,
+  h1 {
+    font-size: clamp(2.85rem, 15vw, 4.2rem) !important;
+    line-height: 0.92 !important;
+    letter-spacing: -3px !important;
+  }
+
+  .subtitle,
+  .app-subtitle,
+  .brand-subtitle,
+  .hero-subtitle {
+    font-size: 0.68rem !important;
+    letter-spacing: 2.5px !important;
+  }
+
+  .topbar,
+  .top-actions,
+  .header-actions,
+  .toolbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+
+  .cards,
+  .dashboard-cards,
+  .financial-grid,
+  .stats-grid,
+  .goals-grid,
+  .insights-grid,
+  .history-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    width: 100% !important;
+  }
+
+  .card,
+  .panel,
+  .widget,
+  .account-card,
+  .goal-card,
+  .history-card,
+  .insight-card,
+  .stat-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .card h2,
+  .card h3,
+  .panel h2,
+  .panel h3,
+  .account-title {
+    font-size: 1rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .value,
+  .money-value,
+  .amount,
+  .account-value,
+  .big-number {
+    font-size: clamp(1.25rem, 7vw, 1.75rem) !important;
+    line-height: 1.1 !important;
+    word-break: break-word;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+  .calendar,
+  .calendar-wrapper,
+  .chart-container,
+  .table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .calendar-grid {
+    min-width: 620px;
+  }
+
+  canvas,
+  svg {
+    max-width: 100% !important;
+  }
+
+  .modal,
+  .dialog,
+  .drawer,
+  .menu-dropdown,
+  .dropdown-menu {
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  .bottom-spacing {
+    height: 88px;
+  }
+}
+
+@media (max-width: 420px) {
+  .logo-title,
+  .brand-title,
+  .app-title,
+  .hero-title,
+  h1 {
+    font-size: clamp(2.55rem, 16vw, 3.45rem) !important;
+    letter-spacing: -2.5px !important;
+  }
+
+  .app-header,
+  .hero-section,
+  .hero {
+    padding-top: 20px !important;
+  }
+
+  .card,
+  .panel,
+  .widget,
+  .account-card {
+    padding: 14px !important;
+  }
+}
