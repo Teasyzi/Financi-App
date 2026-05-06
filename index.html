@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#070a12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Financi App" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Financi App</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">Controle financeiro pessoal</span>
+        <h1>Financi App</h1>
+      </div>
+      <div class="top-actions">
+        <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
+        <button class="ghost-btn" id="importBtn" type="button">Importar</button>
+        <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="main-panel">
+        <div class="month-card card">
+          <button class="nav-arrow" id="prevMonthBtn" type="button" aria-label="Mês anterior">‹</button>
+          <button class="month-display" id="monthPickerBtn" type="button">
+            <span id="currentMonthLabel">Mês</span>
+            <small>clique para escolher mês e ano</small>
+          </button>
+          <button class="nav-arrow" id="nextMonthBtn" type="button" aria-label="Próximo mês">›</button>
+        </div>
+
+        <div class="month-picker card hidden" id="monthPicker">
+          <div class="picker-head">
+            <button class="ghost-btn" id="yearDownBtn" type="button">-</button>
+            <strong id="pickerYearLabel">2026</strong>
+            <button class="ghost-btn" id="yearUpBtn" type="button">+</button>
+          </div>
+          <div class="month-grid" id="monthGrid"></div>
+        </div>
+
+        <section class="summary-grid summary-grid-five">
+          <article class="metric card"><span>Receita líquida</span><strong id="netIncomeMetric">R$ 0,00</strong></article>
+          <article class="metric card"><span>Total do mês</span><strong id="monthTotal">R$ 0,00</strong></article>
+          <article class="metric card"><span>Saldo disponível</span><strong id="monthBalance">R$ 0,00</strong></article>
+          <article class="metric card"><span>Contas ativas</span><strong id="activeAccounts">0</strong></article>
+          <article class="metric card"><span>Risco financeiro</span><strong id="riskMetric">0%</strong></article>
+        </section>
+
+        <section class="card section-card calendar-card">
+          <div class="section-title compact">
+            <div><span class="eyebrow">Calendário financeiro</span><h2>Vencimentos do mês</h2></div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">Lançamentos do mês</span>
+              <h2>Contas e parcelas</h2>
+            </div>
+            <button class="primary-btn" id="openAccountBtn" type="button">+ Adicionar conta</button>
+          </div>
+          <div class="filters" id="categoryFilters"></div>
+          <div class="bill-groups" id="billGroups"></div>
+        </section>
+      </section>
+
+      <aside class="side-panel">
+        <section class="card health-card">
+          <span class="eyebrow">Visão rápida</span>
+          <h2 id="healthTitle">Tudo certo</h2>
+          <p id="healthText">Configure sua renda e adicione contas para ver a saúde do mês.</p>
+        </section>
+
+        <section class="card section-card risk-card">
+          <span class="eyebrow">Risco financeiro</span>
+          <h2 id="riskTitle">Sem dados</h2>
+          <div class="risk-bar"><i id="riskBar"></i></div>
+          <p id="riskText">Informe renda e contas para calcular o nível de comprometimento.</p>
+        </section>
+
+        <section class="card section-card mini-dashboard">
+          <span class="eyebrow">Dashboard inteligente</span>
+          <div class="side-stat"><span>Comprometido</span><b id="commitmentRate">0%</b></div>
+          <div class="side-stat"><span>Contas fixas</span><b id="fixedAccountsMetric">0</b></div>
+          <div class="side-stat"><span>Parcelas ativas</span><b id="activeInstallments">0</b></div>
+          <div class="side-stat"><span>Finalizam no próximo mês</span><b id="endingNextMonth">0</b></div>
+          <div class="side-stat"><span>Pago neste mês</span><b id="paidThisMonth">R$ 0,00</b></div>
+          <div class="side-stat"><span>Falta pagar</span><b id="unpaidThisMonth">R$ 0,00</b></div>
+          <div class="side-stat"><span>Saldo após pagos</span><b id="cashAfterPaid">R$ 0,00</b></div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title compact">
+            <div><span class="eyebrow">Motor financeiro</span><h2>Juros estimados</h2></div>
+          </div>
+          <div id="interestList" class="interest-list"></div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <dialog id="accountDialog" class="modal">
+    <form id="accountForm" method="dialog" class="modal-card">
+      <div class="modal-head">
+        <div><span class="eyebrow">Formulário inteligente</span><h2 id="dialogTitle">Nova conta</h2></div>
+        <button class="icon-btn" type="button" id="closeAccountBtn">×</button>
+      </div>
+      <input type="hidden" id="accountId" />
+      <label class="field full"><span>Nome da conta</span><input id="accountName" type="text" placeholder="Ex: Geladeira, Nubank, Internet" required /></label>
+      <div class="form-grid">
+        <label class="field"><span>Categoria</span><select id="category"></select></label>
+        <label class="field"><span>Tipo</span><select id="accountType"><option value="installment">Parcelada</option><option value="fixed">Fixa mensal</option><option value="single">Única</option></select></label>
+        <label class="field"><span>Data da compra/início</span><input id="purchaseDate" type="date" required /></label>
+        <label class="field dynamic installment-only"><span>Data da 1ª parcela</span><input id="firstPaymentDate" type="date" /></label>
+        <label class="field dynamic installment-only"><span>Quantidade de parcelas</span><input id="installments" type="number" min="1" step="1" value="1" inputmode="numeric" /></label>
+        <label class="field dynamic installment-or-single"><span>Valor da parcela normal</span><input id="installmentValue" type="number" min="0" step="0.01" placeholder="0,00" inputmode="decimal" /></label>
+        <label class="field dynamic fixed-only hidden"><span>Valor mensal</span><input id="fixedValue" type="number" min="0" step="0.01" placeholder="0,00" inputmode="decimal" /></label>
+        <label class="field dynamic installment-only"><span>Valor à vista/opcional</span><input id="cashValue" type="number" min="0" step="0.01" placeholder="Para calcular juros" inputmode="decimal" /></label>
+      </div>
+      <div class="smart-options">
+        <label class="toggle-row dynamic installment-only"><input id="hasDifferentFirst" type="checkbox" /><span>Primeira parcela tem valor diferente</span></label>
+        <label class="field full hidden" id="firstValueWrap"><span>Valor da 1ª parcela</span><input id="firstInstallmentValue" type="number" min="0" step="0.01" placeholder="0,00" inputmode="decimal" /></label>
+      </div>
+      <div class="calc-preview" id="calcPreview"></div>
+      <div class="modal-actions">
+        <button class="danger-btn hidden" type="button" id="deleteAccountBtn">Excluir</button><span></span>
+        <button class="ghost-btn" type="button" id="cancelAccountBtn">Cancelar</button>
+        <button class="primary-btn" type="submit">Salvar conta</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog" class="modal">
+    <form id="settingsForm" method="dialog" class="modal-card">
+      <div class="modal-head">
+        <div><span class="eyebrow">Renda e saldo livre</span><h2>Calculadora salarial</h2></div>
+        <button class="icon-btn" type="button" id="closeSettingsBtn">×</button>
+      </div>
+
+      <div class="income-mode-card">
+        <label class="toggle-row"><input id="useSecondSalary" type="checkbox" /><span>Usar segundo salário / renda do casal</span></label>
+        <p>Quando ativado, o app calcula o líquido de cada pessoa separadamente e soma tudo no saldo disponível.</p>
+      </div>
+
+      <section class="salary-person-card">
+        <div class="person-title"><strong>Salário 1</strong><span>Pessoa principal</span></div>
+        <div class="form-grid">
+          <label class="field"><span>Salário bruto</span><input id="grossSalary" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+          <label class="field"><span>Nome opcional</span><input id="salaryName1" type="text" placeholder="Ex: Meu salário" /></label>
+        </div>
+        <div class="deductions">
+          <label class="toggle-row"><input id="useINSS" type="checkbox" checked /><span>Descontar INSS pela tabela progressiva 2026</span></label>
+          <label class="toggle-row"><input id="showFGTS" type="checkbox" checked /><span>Mostrar FGTS 8% separado, sem descontar do líquido</span></label>
+          <label class="toggle-row"><input id="useTransport" type="checkbox" /><span>Descontar vale-transporte 6%</span></label>
+          <div class="benefit-row"><label class="toggle-row"><input id="useFood" type="checkbox" /><span>Descontar vale alimentação</span></label><select id="foodMode"><option value="value">R$</option><option value="percent">%</option></select><input id="foodValue" type="number" min="0" step="0.01" /></div>
+          <div class="benefit-row"><label class="toggle-row"><input id="useHealth" type="checkbox" /><span>Descontar plano de saúde</span></label><select id="healthMode"><option value="value">R$</option><option value="percent">%</option></select><input id="healthValue" type="number" min="0" step="0.01" /></div>
+        </div>
+      </section>
+
+      <section class="salary-person-card hidden" id="secondSalarySection">
+        <div class="person-title"><strong>Salário 2</strong><span>Outra pessoa / renda conjunta</span></div>
+        <div class="form-grid">
+          <label class="field"><span>Salário bruto</span><input id="grossSalary2" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+          <label class="field"><span>Nome opcional</span><input id="salaryName2" type="text" placeholder="Ex: Salário do cônjuge" /></label>
+        </div>
+        <div class="deductions">
+          <label class="toggle-row"><input id="useINSS2" type="checkbox" checked /><span>Descontar INSS pela tabela progressiva 2026</span></label>
+          <label class="toggle-row"><input id="showFGTS2" type="checkbox" checked /><span>Mostrar FGTS 8% separado, sem descontar do líquido</span></label>
+          <label class="toggle-row"><input id="useTransport2" type="checkbox" /><span>Descontar vale-transporte 6%</span></label>
+          <div class="benefit-row"><label class="toggle-row"><input id="useFood2" type="checkbox" /><span>Descontar vale alimentação</span></label><select id="foodMode2"><option value="value">R$</option><option value="percent">%</option></select><input id="foodValue2" type="number" min="0" step="0.01" /></div>
+          <div class="benefit-row"><label class="toggle-row"><input id="useHealth2" type="checkbox" /><span>Descontar plano de saúde</span></label><select id="healthMode2"><option value="value">R$</option><option value="percent">%</option></select><input id="healthValue2" type="number" min="0" step="0.01" /></div>
+        </div>
+      </section>
+
+      <div class="form-grid extra-balance-grid">
+        <label class="field"><span>Saldo manual extra/opcional</span><input id="manualBalance" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Somar ao líquido do casal" /></label>
+      </div>
+
+      <div class="salary-preview" id="salaryPreview"></div>
+      <div class="modal-actions"><span></span><span></span><button class="ghost-btn" type="button" id="cancelSettingsBtn">Cancelar</button><button class="primary-btn" type="submit">Salvar renda</button></div>
+    </form>
+  </dialog>
+  <input type="file" id="importFile" accept="application/json" hidden />
+  <script src="app.js"></script>
+</body>
+</html>

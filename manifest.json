@@ -1,0 +1,11 @@
+{
+  "name": "Financi App",
+  "short_name": "Financi",
+  "description": "Controle financeiro pessoal com parcelas, juros e renda líquida.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#070a12",
+  "theme_color": "#070a12",
+  "orientation": "portrait-primary",
+  "icons": []
+}
