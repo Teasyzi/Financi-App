@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="Financi App" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
-  <title>Financi App</title>
+  <title>Financi App V6.1 Premium</title>
 </head>
 <body>
   <section class="auth-screen" id="authScreen">
@@ -34,7 +34,10 @@
         <button class="ghost-btn" id="importBtn" type="button">Importar</button>
         <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
         <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
+        <button class="ghost-btn" id="openSecurityBtn" type="button">Segurança</button>
         <button class="ghost-btn" id="openGroupBtn" type="button">Grupo</button>
+        <button class="ghost-btn" id="toggleValuesBtn" type="button">Ocultar valores</button>
+        <button class="ghost-btn" id="lockAppBtn" type="button">Bloquear</button>
         <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
       </div>
     </header>
@@ -65,6 +68,46 @@
           <article class="metric card"><span>Saldo disponível</span><strong id="monthBalance">R$ 0,00</strong></article>
           <article class="metric card"><span>Contas ativas</span><strong id="activeAccounts">0</strong></article>
           <article class="metric card"><span>Risco financeiro</span><strong id="riskMetric">0%</strong></article>
+        </section>
+
+        <section class="premium-grid">
+          <article class="card section-card score-card">
+            <span class="eyebrow">Score Financi</span>
+            <div class="score-circle"><strong id="financeScore">0</strong><small>/100</small></div>
+            <p id="scoreText">Configure sua renda e contas para calcular seu score.</p>
+          </article>
+          <article class="card section-card">
+            <div class="section-title compact"><div><span class="eyebrow">IA financeira</span><h2>Diagnósticos e sugestões</h2></div></div>
+            <div id="aiInsights" class="ai-list"></div>
+          </article>
+        </section>
+
+        <section class="card section-card charts-card">
+          <div class="section-title compact"><div><span class="eyebrow">Dashboard premium</span><h2>Gráficos e ranking</h2></div></div>
+          <div class="chart-grid">
+            <div><h3>Gastos por categoria</h3><div id="categoryChart" class="bar-chart"></div></div>
+            <div><h3>Renda x dívida</h3><div id="incomeDebtChart" class="bar-chart"></div></div>
+            <div><h3>Parcelas futuras</h3><div id="futureChart" class="bar-chart"></div></div>
+          </div>
+          <div id="categoryRanking" class="ranking-list"></div>
+        </section>
+
+        <section class="card section-card goals-card">
+          <div class="section-title">
+            <div><span class="eyebrow">Metas e sonhos</span><h2>Objetivos financeiros</h2></div>
+            <button class="primary-btn" id="openGoalBtn" type="button">+ Criar meta</button>
+          </div>
+          <div id="goalsList" class="goals-list"></div>
+        </section>
+
+        <section class="card section-card timeline-card">
+          <div class="section-title compact"><div><span class="eyebrow">Histórico financeiro</span><h2>Timeline do mês</h2></div></div>
+          <div id="historyTimeline" class="timeline-list"></div>
+        </section>
+
+        <section class="card section-card achievements-card">
+          <div class="section-title compact"><div><span class="eyebrow">Gamificação</span><h2>Conquistas</h2></div></div>
+          <div id="achievementsList" class="achievements-list"></div>
         </section>
 
         <section class="card section-card calendar-card">
@@ -144,6 +187,54 @@
       </aside>
     </main>
   </div>
+
+
+  <dialog id="goalDialog" class="modal">
+    <form id="goalForm" method="dialog" class="modal-card small">
+      <div class="modal-head">
+        <div><span class="eyebrow">Metas e sonhos</span><h2 id="goalDialogTitle">Nova meta</h2></div>
+        <button class="icon-btn" type="button" id="closeGoalBtn">×</button>
+      </div>
+      <input id="goalId" type="hidden" />
+      <label class="field full"><span>Nome da meta</span><input id="goalName" type="text" placeholder="Reserva de emergência" required /></label>
+      <div class="form-grid">
+        <label class="field"><span>Valor alvo</span><input id="goalTarget" type="number" min="0" step="0.01" placeholder="10000" required /></label>
+        <label class="field"><span>Valor guardado</span><input id="goalSaved" type="number" min="0" step="0.01" placeholder="2450" /></label>
+        <label class="field"><span>Prazo desejado</span><input id="goalDeadline" type="date" /></label>
+        <label class="field"><span>Prioridade</span><select id="goalPriority"><option>Alta</option><option>Média</option><option>Baixa</option></select></label>
+      </div>
+      <div class="calc-preview" id="goalPreview">A previsão será calculada com base na sobra mensal.</div>
+      <div class="modal-actions">
+        <button class="danger-btn hidden" id="deleteGoalBtn" type="button">Excluir</button>
+        <span></span>
+        <button class="ghost-btn" id="cancelGoalBtn" type="button">Cancelar</button>
+        <button class="primary-btn" type="submit">Salvar meta</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="securityDialog" class="modal">
+    <form id="securityForm" method="dialog" class="modal-card small">
+      <div class="modal-head">
+        <div><span class="eyebrow">Segurança premium</span><h2>PIN e privacidade</h2></div>
+        <button class="icon-btn" type="button" id="closeSecurityBtn">×</button>
+      </div>
+      <label class="toggle-row"><input id="enablePin" type="checkbox" /> <span>Ativar PIN local neste aparelho</span></label>
+      <label class="field full"><span>PIN de 4 a 8 números</span><input id="pinValue" type="password" inputmode="numeric" maxlength="8" placeholder="****" /></label>
+      <label class="toggle-row"><input id="autoLock" type="checkbox" /> <span>Bloquear automaticamente ao abrir o app</span></label>
+      <label class="toggle-row"><input id="hideValuesSetting" type="checkbox" /> <span>Iniciar com valores ocultos</span></label>
+      <div class="modal-actions"><span></span><button class="ghost-btn" id="cancelSecurityBtn" type="button">Cancelar</button><button class="primary-btn" type="submit">Salvar segurança</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="lockDialog" class="modal lock-modal">
+    <form id="unlockForm" method="dialog" class="modal-card small">
+      <div class="modal-head"><div><span class="eyebrow">App bloqueado</span><h2>Digite seu PIN</h2></div></div>
+      <label class="field full"><span>PIN</span><input id="unlockPin" type="password" inputmode="numeric" maxlength="8" autofocus /></label>
+      <small id="unlockStatus"></small>
+      <div class="modal-actions"><span></span><button class="primary-btn" type="submit">Desbloquear</button></div>
+    </form>
+  </dialog>
 
   <dialog id="groupDialog" class="modal">
     <div class="modal-card small group-modal-card">
