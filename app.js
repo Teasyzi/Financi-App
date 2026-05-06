@@ -425,3 +425,33 @@ $('openSecurityBtn')?.addEventListener('click',openSecurity);$('securityForm')?.
 if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 showLoggedOut();
 initAuth();
+
+
+// V6.2: menu superior limpo e comportamento mobile
+(function setupCleanMobileMenu(){
+  const ready = () => {
+    const btn = document.getElementById('moreMenuBtn');
+    const menu = document.getElementById('overflowMenu');
+    if(!btn || !menu) return;
+    btn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const willOpen = menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', !willOpen);
+      btn.setAttribute('aria-expanded', String(willOpen));
+    });
+    menu.addEventListener('click', (event) => {
+      if(event.target.closest('button')){
+        menu.classList.add('hidden');
+        btn.setAttribute('aria-expanded','false');
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if(!event.target.closest('.menu-wrap')){
+        menu.classList.add('hidden');
+        btn.setAttribute('aria-expanded','false');
+      }
+    });
+  };
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready);
+  else ready();
+})();
