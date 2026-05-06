@@ -12,6 +12,26 @@
   <title>Financi App V6.2 Mobile Clean</title>
 </head>
 <body>
+
+<div id="financiFixedHeader" class="financi-fixed-header">
+  <div class="ffh-brand">
+    <span class="ffh-kicker">Controle financeiro pessoal</span>
+    <strong>Financi App</strong>
+  </div>
+
+  <div class="ffh-actions">
+    <button class="ffh-profile" type="button" aria-label="Perfil">
+      <span class="ffh-avatar">U</span>
+      <span class="ffh-name">Usuário</span>
+    </button>
+    <button class="ffh-btn" type="button" data-proxy="renda">Renda</button>
+    <button class="ffh-btn" type="button" data-proxy="ocultar">Ocultar</button>
+    <button class="ffh-menu-btn" type="button" aria-label="Abrir menu">☰</button>
+  </div>
+
+  <div class="ffh-menu" aria-hidden="true"></div>
+</div>
+
   <section class="auth-screen" id="authScreen">
     <div class="auth-card card">
       <span class="eyebrow">Financi App seguro</span>
@@ -393,129 +413,209 @@
 
 
 
+
+
+
+
+
+
 <script>
 (function () {
   function q(sel) { return document.querySelector(sel); }
   function qa(sel) { return Array.from(document.querySelectorAll(sel)); }
 
-  function findDashboardGrid() {
-    return q('.dashboard-cards') || q('.financial-grid') || q('.stats-grid') || q('.summary-grid') || q('.cards');
+  function textOf(el) {
+    return (el && (el.innerText || el.textContent) || '').trim().replace(/\s+/g, ' ');
   }
 
-  function setupMobileDashboardCollapse() {
-    if (window.innerWidth > 900) return;
+  function findButtonByText(words) {
+    var buttons = qa('button, a');
+    return buttons.find(function(btn) {
+      if (btn.closest('#financiFixedHeader')) return false;
+      var t = textOf(btn).toLowerCase();
+      return words.some(function(w) { return t.includes(w); });
+    });
+  }
 
-    var grid = findDashboardGrid();
-    if (!grid) return;
+  function syncProfile() {
+    var header = q('#financiFixedHeader');
+    if (!header) return;
+
+    var nameEl = header.querySelector('.ffh-name');
+    var avatarEl = header.querySelector('.ffh-avatar');
+
+    var possibleProfile =
+      q('.profile-chip') ||
+      q('.user-chip') ||
+      q('.profile-button') ||
+      q('.user-profile');
+
+    if (possibleProfile) {
+      var name = textOf(possibleProfile).replace(/perfil/i, '').trim();
+      if (name) nameEl.textContent = name;
+
+      var img = possibleProfile.querySelector('img');
+      if (img && img.src) {
+        avatarEl.innerHTML = '';
+        var cloned = document.createElement('img');
+        cloned.src = img.src;
+        cloned.alt = 'Perfil';
+        avatarEl.appendChild(cloned);
+      } else if (name) {
+        avatarEl.textContent = name.charAt(0).toUpperCase();
+      }
+    }
+  }
+
+  function setupHeaderButtons() {
+    var header = q('#financiFixedHeader');
+    if (!header) return;
+
+    var rendaProxy = header.querySelector('[data-proxy="renda"]');
+    var ocultarProxy = header.querySelector('[data-proxy="ocultar"]');
+    var profileProxy = header.querySelector('.ffh-profile');
+
+    if (rendaProxy && !rendaProxy.dataset.bound) {
+      rendaProxy.dataset.bound = '1';
+      rendaProxy.addEventListener('click', function() {
+        var real = findButtonByText(['renda']);
+        if (real) real.click();
+      });
+    }
+
+    if (ocultarProxy && !ocultarProxy.dataset.bound) {
+      ocultarProxy.dataset.bound = '1';
+      ocultarProxy.addEventListener('click', function() {
+        var real = findButtonByText(['ocultar']);
+        if (real) real.click();
+      });
+    }
+
+    if (profileProxy && !profileProxy.dataset.bound) {
+      profileProxy.dataset.bound = '1';
+      profileProxy.addEventListener('click', function() {
+        var real = findButtonByText(['perfil']);
+        if (real) real.click();
+      });
+    }
+  }
+
+  function buildMenu() {
+    var header = q('#financiFixedHeader');
+    if (!header) return;
+
+    var menu = header.querySelector('.ffh-menu');
+    var menuButton = header.querySelector('.ffh-menu-btn');
+
+    if (!menu || !menuButton) return;
+
+    var labels = [
+      ['Perfil', ['perfil']],
+      ['Segurança', ['segurança', 'seguranca']],
+      ['Grupo / Família', ['grupo', 'família', 'familia']],
+      ['Exportar backup', ['exportar']],
+      ['Importar backup', ['importar']],
+      ['Bloquear app', ['bloquear']],
+      ['Sair', ['sair']]
+    ];
+
+    menu.innerHTML = '';
+
+    labels.forEach(function(item) {
+      var label = item[0];
+      var words = item[1];
+      var real = findButtonByText(words);
+      if (!real) return;
+
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = label;
+      b.addEventListener('click', function() {
+        menu.classList.remove('open');
+        menu.setAttribute('aria-hidden', 'true');
+        real.click();
+      });
+      menu.appendChild(b);
+    });
+
+    if (!menu.children.length) {
+      ['Perfil', 'Segurança', 'Grupo / Família', 'Exportar backup', 'Importar backup', 'Bloquear app', 'Sair'].forEach(function(label) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = label;
+        menu.appendChild(b);
+      });
+    }
+
+    if (!menuButton.dataset.bound) {
+      menuButton.dataset.bound = '1';
+      menuButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        menu.classList.toggle('open');
+        menu.setAttribute('aria-hidden', menu.classList.contains('open') ? 'false' : 'true');
+      });
+    }
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#financiFixedHeader')) {
+        menu.classList.remove('open');
+        menu.setAttribute('aria-hidden', 'true');
+      }
+    });
+  }
+
+  function setupDashboardCollapse() {
+    if (window.innerWidth > 900) {
+      document.body.classList.remove('dashboard-mobile-collapsed');
+      return;
+    }
 
     document.body.classList.add('dashboard-mobile-collapsed');
 
-    if (!q('.mobile-dashboard-toggle')) {
-      var btn = document.createElement('button');
-      btn.className = 'mobile-dashboard-toggle';
-      btn.type = 'button';
-      btn.textContent = 'Mostrar dashboard';
+    if (q('.mobile-dashboard-toggle')) return;
 
-      grid.parentNode.insertBefore(btn, grid);
+    var grid = q('.dashboard-cards') || q('.financial-grid') || q('.stats-grid') || q('.summary-grid') || q('.cards');
+    if (!grid) return;
 
-      btn.addEventListener('click', function () {
-        document.body.classList.toggle('dashboard-mobile-collapsed');
-        btn.textContent = document.body.classList.contains('dashboard-mobile-collapsed')
-          ? 'Mostrar dashboard'
-          : 'Ocultar dashboard';
-      });
-    }
-  }
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mobile-dashboard-toggle';
+    btn.textContent = 'Mostrar dashboard';
+    grid.parentNode.insertBefore(btn, grid);
 
-  function setupMenuOverlay() {
-    var buttons = qa('.mobile-menu-button, .menu-toggle, .hamburger, #menuToggle, button[aria-label="Menu"]');
-
-    buttons.forEach(function (btn) {
-      if (btn.dataset.v66Menu === '1') return;
-      btn.dataset.v66Menu = '1';
-
-      btn.addEventListener('click', function () {
-        setTimeout(function () {
-          var menu = q('.menu-dropdown') || q('.dropdown-menu') || q('.mobile-menu') || q('.side-menu') || q('.drawer');
-          if (!menu) return;
-
-          var opened = menu.classList.contains('open') || menu.classList.contains('active') || menu.getAttribute('data-open') === 'true';
-
-          qa('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer').forEach(function (m) {
-            if (m !== menu) {
-              m.classList.remove('open', 'active');
-              m.removeAttribute('data-open');
-            }
-          });
-
-          if (opened) {
-            menu.classList.remove('open', 'active');
-            menu.removeAttribute('data-open');
-          } else {
-            menu.classList.add('open');
-            menu.setAttribute('data-open', 'true');
-          }
-
-          document.documentElement.style.overflowX = 'hidden';
-          document.body.style.overflowX = 'hidden';
-        }, 0);
-      });
-    });
-
-    document.addEventListener('click', function(e) {
-      var clickedMenuButton = e.target.closest('.mobile-menu-button, .menu-toggle, .hamburger, #menuToggle, button[aria-label="Menu"]');
-      var clickedMenu = e.target.closest('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer');
-
-      if (!clickedMenuButton && !clickedMenu && window.innerWidth <= 900) {
-        qa('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer').forEach(function(menu) {
-          menu.classList.remove('open', 'active');
-          menu.removeAttribute('data-open');
-        });
-      }
+    btn.addEventListener('click', function() {
+      document.body.classList.toggle('dashboard-mobile-collapsed');
+      btn.textContent = document.body.classList.contains('dashboard-mobile-collapsed')
+        ? 'Mostrar dashboard'
+        : 'Ocultar dashboard';
     });
   }
 
-  function hardNoHorizontalScroll() {
+  function hardFixLayout() {
     document.documentElement.style.overflowX = 'hidden';
     document.body.style.overflowX = 'hidden';
-
-    if (window.innerWidth > 900) return;
-
-    qa('body *').forEach(function (el) {
-      var rect = el.getBoundingClientRect();
-      if (rect.width > window.innerWidth + 4 || rect.left < -4 || rect.right > window.innerWidth + 4) {
-        el.style.maxWidth = '100%';
-        el.style.minWidth = '0';
-        if (!el.classList.contains('calendar-grid')) {
-          el.style.overflowX = 'hidden';
-        }
-      }
-    });
   }
 
-  function initV66() {
-    setupMobileDashboardCollapse();
-    setupMenuOverlay();
-    hardNoHorizontalScroll();
+  function init() {
+    syncProfile();
+    setupHeaderButtons();
+    buildMenu();
+    setupDashboardCollapse();
+    hardFixLayout();
 
-    setTimeout(hardNoHorizontalScroll, 300);
-    setTimeout(hardNoHorizontalScroll, 1200);
-    setTimeout(hardNoHorizontalScroll, 3000);
+    setTimeout(syncProfile, 800);
+    setTimeout(buildMenu, 1000);
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initV66);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    initV66();
+    init();
   }
 
-  window.addEventListener('load', initV66);
-  window.addEventListener('resize', function () {
-    if (window.innerWidth <= 900) {
-      document.body.classList.add('dashboard-mobile-collapsed');
-    }
-    hardNoHorizontalScroll();
-  });
+  window.addEventListener('load', init);
+  window.addEventListener('resize', setupDashboardCollapse);
 })();
 </script>
 
