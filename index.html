@@ -390,40 +390,68 @@
   <input type="file" id="importFile" accept="application/json" hidden />
   <script type="module" src="app.js"></script>
 
+
+
+
 <script>
 (function () {
-  function closeMenusExcept(target) {
-    document.querySelectorAll('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer').forEach(function(menu) {
-      if (menu !== target) {
-        menu.classList.remove('open', 'active');
-        menu.removeAttribute('data-open');
-      }
-    });
+  function q(sel) { return document.querySelector(sel); }
+  function qa(sel) { return Array.from(document.querySelectorAll(sel)); }
+
+  function findDashboardGrid() {
+    return q('.dashboard-cards') || q('.financial-grid') || q('.stats-grid') || q('.summary-grid') || q('.cards');
   }
 
-  function setupMobileMenuFix() {
-    var buttons = document.querySelectorAll('.mobile-menu-button, .menu-toggle, .hamburger, #menuToggle, button[aria-label="Menu"]');
+  function setupMobileDashboardCollapse() {
+    if (window.innerWidth > 900) return;
 
-    buttons.forEach(function(btn) {
-      if (btn.dataset.mobileFixBound === 'true') return;
-      btn.dataset.mobileFixBound = 'true';
+    var grid = findDashboardGrid();
+    if (!grid) return;
 
-      btn.addEventListener('click', function(e) {
-        setTimeout(function() {
-          var menu =
-            document.querySelector('.menu-dropdown') ||
-            document.querySelector('.dropdown-menu') ||
-            document.querySelector('.mobile-menu') ||
-            document.querySelector('.side-menu') ||
-            document.querySelector('.drawer');
+    document.body.classList.add('dashboard-mobile-collapsed');
 
+    if (!q('.mobile-dashboard-toggle')) {
+      var btn = document.createElement('button');
+      btn.className = 'mobile-dashboard-toggle';
+      btn.type = 'button';
+      btn.textContent = 'Mostrar dashboard';
+
+      grid.parentNode.insertBefore(btn, grid);
+
+      btn.addEventListener('click', function () {
+        document.body.classList.toggle('dashboard-mobile-collapsed');
+        btn.textContent = document.body.classList.contains('dashboard-mobile-collapsed')
+          ? 'Mostrar dashboard'
+          : 'Ocultar dashboard';
+      });
+    }
+  }
+
+  function setupMenuOverlay() {
+    var buttons = qa('.mobile-menu-button, .menu-toggle, .hamburger, #menuToggle, button[aria-label="Menu"]');
+
+    buttons.forEach(function (btn) {
+      if (btn.dataset.v66Menu === '1') return;
+      btn.dataset.v66Menu = '1';
+
+      btn.addEventListener('click', function () {
+        setTimeout(function () {
+          var menu = q('.menu-dropdown') || q('.dropdown-menu') || q('.mobile-menu') || q('.side-menu') || q('.drawer');
           if (!menu) return;
 
-          closeMenusExcept(menu);
+          var opened = menu.classList.contains('open') || menu.classList.contains('active') || menu.getAttribute('data-open') === 'true';
 
-          var isOpen = menu.classList.contains('open') || menu.classList.contains('active') || menu.getAttribute('data-open') === 'true';
+          qa('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer').forEach(function (m) {
+            if (m !== menu) {
+              m.classList.remove('open', 'active');
+              m.removeAttribute('data-open');
+            }
+          });
 
-          if (!isOpen) {
+          if (opened) {
+            menu.classList.remove('open', 'active');
+            menu.removeAttribute('data-open');
+          } else {
             menu.classList.add('open');
             menu.setAttribute('data-open', 'true');
           }
@@ -433,75 +461,61 @@
         }, 0);
       });
     });
-  }
 
-  function createSummaryToggle() {
-    if (window.innerWidth > 768) return;
-    if (document.querySelector('.mobile-summary-toggle')) return;
+    document.addEventListener('click', function(e) {
+      var clickedMenuButton = e.target.closest('.mobile-menu-button, .menu-toggle, .hamburger, #menuToggle, button[aria-label="Menu"]');
+      var clickedMenu = e.target.closest('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer');
 
-    var possibleStats =
-      document.querySelector('.dashboard-cards') ||
-      document.querySelector('.financial-grid') ||
-      document.querySelector('.stats-grid') ||
-      document.querySelector('.summary-grid');
-
-    if (!possibleStats) return;
-
-    var btn = document.createElement('button');
-    btn.className = 'mobile-summary-toggle';
-    btn.textContent = 'Mostrar/ocultar resumo completo';
-    btn.style.padding = '14px';
-    btn.style.borderRadius = '18px';
-    btn.style.border = '1px solid rgba(255,255,255,.10)';
-    btn.style.background = 'rgba(255,255,255,.08)';
-    btn.style.color = '#fff';
-    btn.style.fontWeight = '700';
-
-    possibleStats.parentNode.insertBefore(btn, possibleStats);
-
-    var collapsed = true;
-    function apply() {
-      var children = Array.from(possibleStats.children);
-      children.forEach(function(child, index) {
-        if (index > 1) child.style.display = collapsed ? 'none' : '';
-      });
-      btn.textContent = collapsed ? 'Mostrar resumo completo' : 'Ocultar resumo completo';
-    }
-
-    btn.addEventListener('click', function() {
-      collapsed = !collapsed;
-      apply();
+      if (!clickedMenuButton && !clickedMenu && window.innerWidth <= 900) {
+        qa('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer').forEach(function(menu) {
+          menu.classList.remove('open', 'active');
+          menu.removeAttribute('data-open');
+        });
+      }
     });
-
-    apply();
   }
 
-  function hardLimitWidth() {
+  function hardNoHorizontalScroll() {
     document.documentElement.style.overflowX = 'hidden';
     document.body.style.overflowX = 'hidden';
 
-    if (window.innerWidth <= 768) {
-      document.querySelectorAll('body *').forEach(function(el) {
-        var rect = el.getBoundingClientRect();
-        if (rect.width > window.innerWidth + 8) {
-          el.style.maxWidth = '100vw';
-          el.style.minWidth = '0';
+    if (window.innerWidth > 900) return;
+
+    qa('body *').forEach(function (el) {
+      var rect = el.getBoundingClientRect();
+      if (rect.width > window.innerWidth + 4 || rect.left < -4 || rect.right > window.innerWidth + 4) {
+        el.style.maxWidth = '100%';
+        el.style.minWidth = '0';
+        if (!el.classList.contains('calendar-grid')) {
           el.style.overflowX = 'hidden';
         }
-      });
-    }
+      }
+    });
   }
 
-  window.addEventListener('load', function() {
-    setupMobileMenuFix();
-    createSummaryToggle();
-    hardLimitWidth();
-    setTimeout(hardLimitWidth, 500);
-    setTimeout(hardLimitWidth, 2000);
-    setTimeout(setupMobileMenuFix, 2000);
-  });
+  function initV66() {
+    setupMobileDashboardCollapse();
+    setupMenuOverlay();
+    hardNoHorizontalScroll();
 
-  window.addEventListener('resize', hardLimitWidth);
+    setTimeout(hardNoHorizontalScroll, 300);
+    setTimeout(hardNoHorizontalScroll, 1200);
+    setTimeout(hardNoHorizontalScroll, 3000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initV66);
+  } else {
+    initV66();
+  }
+
+  window.addEventListener('load', initV66);
+  window.addEventListener('resize', function () {
+    if (window.innerWidth <= 900) {
+      document.body.classList.add('dashboard-mobile-collapsed');
+    }
+    hardNoHorizontalScroll();
+  });
 })();
 </script>
 

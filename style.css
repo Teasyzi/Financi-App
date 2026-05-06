@@ -88,95 +88,6 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
 @media(max-width:390px){.clean-actions{grid-template-columns:1fr auto auto!important}.clean-actions #toggleValuesBtn{grid-column:2/4}.menu-wrap{grid-column:4/5}.summary-grid,.summary-grid-five{grid-template-columns:1fr!important}.topbar>div:first-child{display:none}.topbar{padding-top:8px}.month-display small{display:none}}
 
 
-/* =========================================================
-   FINANCI APP V6.5 — MOBILE ULTRA CLEAN / ANTI-ESTOURO
-   Foco: celular, sem largura lateral, menos rolagem e contas mais cedo.
-========================================================= */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box !important;
-}
-
-html,
-body {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  overflow-x: clip !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background:
-    radial-gradient(circle at top left, rgba(22, 101, 52, .62), rgba(2, 44, 34, .52) 26%, rgba(2, 6, 23, .98) 68%),
-    #020617 !important;
-}
-
-/* Trava qualquer elemento que esteja criando rolagem lateral */
-body > *,
-.app,
-.page,
-.wrapper,
-.container,
-main,
-.main,
-.content,
-.main-content,
-.dashboard,
-.dashboard-page,
-section,
-header,
-.app-header,
-.hero,
-.hero-section,
-.topbar,
-.toolbar,
-.header-actions,
-.top-actions,
-.cards,
-.dashboard-cards,
-.financial-grid,
-.stats-grid,
-.month-card,
-.month-selector,
-.calendar,
-.chart-container,
-.panel,
-.card,
-.account-card {
-  max-width: 100% !important;
-  min-width: 0 !important;
-}
-
-/* Remove fundos diferentes do topo */
-header,
-.app-header,
-.hero,
-.hero-section,
-.brand-area,
-.logo-area,
-.top-header {
-  background: transparent !important;
-  background-color: transparent !important;
-  box-shadow: none !important;
-  border-color: rgba(255,255,255,.08) !important;
-}
-
-/* Botões e cards mais consistentes */
-button,
-.btn,
-.action-btn,
-.card,
-.panel,
-.account-card,
-.stat-card,
-.goal-card,
-.history-card,
-.insight-card,
-.month-card,
-.month-selector {
-  border-radius: 22px;
-}
 
 /* =========================================================
    MOBILE
@@ -545,6 +456,564 @@ button,
   .big-number,
   .stat-value {
     font-size: 1.65rem !important;
+  }
+}
+
+
+/* =========================================================
+   FINANCI APP V6.6 — RESPONSIVIDADE TOTAL / MOBILE COMPACTO
+   Corrige:
+   - título quebrando em celulares pequenos
+   - layout estourando para os lados
+   - menu empurrando conteúdo
+   - dashboard excessivo no celular
+========================================================= */
+
+:root {
+  --safe-x: clamp(12px, 4vw, 22px);
+  --green-bg: #06472c;
+  --dark-card: rgba(8, 20, 34, 0.92);
+  --dark-card-2: rgba(10, 25, 42, 0.88);
+  --border-soft: rgba(255,255,255,.10);
+  --text-main: #f8fafc;
+  --text-muted: #a7b0c2;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box !important;
+}
+
+html {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  overflow-x: hidden !important;
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at top left, rgba(20, 112, 63, .58) 0%, rgba(5, 70, 44, .54) 28%, rgba(2, 6, 23, .98) 82%),
+    #020617 !important;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100% !important;
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+  font: inherit;
+}
+
+body > *,
+.app,
+.page,
+.wrapper,
+.container,
+main,
+.main,
+.content,
+.main-content,
+.dashboard,
+.dashboard-page,
+section,
+header,
+.app-header,
+.hero,
+.hero-section,
+.topbar,
+.toolbar,
+.header-actions,
+.top-actions,
+.quick-actions,
+.cards,
+.dashboard-cards,
+.financial-grid,
+.stats-grid,
+.summary-grid,
+.month-card,
+.month-selector,
+.month-navigation,
+.month-nav,
+.panel,
+.card,
+.account-card,
+.bill-card {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Desktop mantém visual premium */
+.card,
+.panel,
+.widget,
+.account-card,
+.bill-card,
+.stat-card,
+.goal-card,
+.history-card,
+.insight-card,
+.month-card,
+.month-selector,
+.month-navigation,
+.month-nav {
+  background: var(--dark-card) !important;
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--text-main);
+}
+
+/* =========================================================
+   MOBILE UNIVERSAL
+========================================================= */
+
+@media (max-width: 900px) {
+  html,
+  body {
+    overflow-x: hidden !important;
+  }
+
+  body {
+    min-width: 320px;
+  }
+
+  body * {
+    max-width: 100%;
+  }
+
+  .app,
+  .page,
+  .wrapper,
+  .container,
+  main,
+  .main,
+  .content,
+  .main-content,
+  .dashboard,
+  .dashboard-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: var(--safe-x) !important;
+    padding-right: var(--safe-x) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  /* O topo não pode mais ser um hero gigante no celular */
+  header,
+  .app-header,
+  .hero,
+  .hero-section,
+  .top-header,
+  .brand-area,
+  .logo-area {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 14px var(--safe-x) 10px !important;
+    overflow: visible !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+
+  /* Título gigante vira marca compacta */
+  .logo-title,
+  .brand-title,
+  .app-title,
+  .hero-title,
+  header h1,
+  .app-header h1,
+  .hero h1,
+  .hero-section h1 {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 0 10px 0 !important;
+    padding: 8px 14px !important;
+    border-radius: 999px !important;
+    background: rgba(255,255,255,.08) !important;
+    border: 1px solid rgba(255,255,255,.10) !important;
+    font-size: clamp(1.25rem, 6vw, 1.65rem) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -0.8px !important;
+    white-space: nowrap !important;
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .subtitle,
+  .app-subtitle,
+  .brand-subtitle,
+  .hero-subtitle,
+  header p:first-child,
+  .app-header p:first-child,
+  .hero p:first-child {
+    display: none !important;
+  }
+
+  /* Ações principais em grade fluida */
+  .topbar,
+  .toolbar,
+  .header-actions,
+  .top-actions,
+  .quick-actions {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr auto !important;
+    gap: 8px !important;
+    align-items: center !important;
+    margin: 8px 0 14px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .profile-chip,
+  .user-chip,
+  .profile-button,
+  .user-profile {
+    grid-column: 1 / -1 !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    height: 44px !important;
+    padding: 7px 12px !important;
+    overflow: hidden !important;
+  }
+
+  .profile-chip img,
+  .user-chip img,
+  .profile-button img,
+  .user-profile img {
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 30px !important;
+  }
+
+  .profile-chip span,
+  .user-chip span,
+  .profile-button span,
+  .user-profile span {
+    max-width: 150px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .topbar button,
+  .toolbar button,
+  .header-actions button,
+  .top-actions button,
+  .quick-actions button {
+    min-width: 0 !important;
+    width: 100% !important;
+    height: 48px !important;
+    padding: 0 12px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    font-size: clamp(.84rem, 4vw, 1rem) !important;
+    border-radius: 18px !important;
+  }
+
+  .mobile-menu-button,
+  .menu-toggle,
+  .hamburger,
+  #menuToggle,
+  button[aria-label="Menu"] {
+    width: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    height: 48px !important;
+    padding: 0 !important;
+    font-size: 1.4rem !important;
+  }
+
+  /* Menu como overlay, nunca lateral empurrando tela */
+  .menu-dropdown,
+  .dropdown-menu,
+  .mobile-menu,
+  .side-menu,
+  .drawer {
+    position: fixed !important;
+    top: 78px !important;
+    left: var(--safe-x) !important;
+    right: var(--safe-x) !important;
+    width: auto !important;
+    max-width: calc(100vw - (var(--safe-x) * 2)) !important;
+    min-width: 0 !important;
+    max-height: calc(100vh - 96px) !important;
+    overflow-y: auto !important;
+    transform: none !important;
+    translate: none !important;
+    margin: 0 !important;
+    z-index: 99999 !important;
+    border-radius: 22px !important;
+    background: rgba(15, 23, 42, .98) !important;
+    border: 1px solid rgba(255,255,255,.10) !important;
+    box-shadow: 0 24px 80px rgba(0,0,0,.55) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+  }
+
+  .menu-dropdown:not(.open):not(.active):not([data-open="true"]),
+  .dropdown-menu:not(.open):not(.active):not([data-open="true"]),
+  .mobile-menu:not(.open):not(.active):not([data-open="true"]),
+  .side-menu:not(.open):not(.active):not([data-open="true"]),
+  .drawer:not(.open):not(.active):not([data-open="true"]) {
+    display: none !important;
+  }
+
+  /* Mês compacto, sem ultrapassar */
+  .month-card,
+  .month-selector,
+  .month-navigation,
+  .month-nav {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 52px minmax(0, 1fr) 52px !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    margin: 12px 0 !important;
+    overflow: hidden !important;
+    border-radius: 22px !important;
+  }
+
+  .month-card button,
+  .month-selector button,
+  .month-navigation button,
+  .month-nav button {
+    width: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    height: 52px !important;
+    padding: 0 !important;
+  }
+
+  .month-card h2,
+  .month-selector h2,
+  .month-navigation h2,
+  .month-nav h2,
+  .month-title {
+    min-width: 0 !important;
+    text-align: center !important;
+    font-size: clamp(1.05rem, 6vw, 1.45rem) !important;
+    line-height: 1.1 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: normal !important;
+  }
+
+  /* Dashboard mobile começa recolhido via JS.
+     Quando aberto, fica em cards compactos. */
+  .dashboard-cards,
+  .financial-grid,
+  .stats-grid,
+  .summary-grid,
+  .cards {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin: 10px 0 12px !important;
+  }
+
+  .dashboard-mobile-collapsed .dashboard-cards,
+  .dashboard-mobile-collapsed .financial-grid,
+  .dashboard-mobile-collapsed .stats-grid,
+  .dashboard-mobile-collapsed .summary-grid {
+    display: none !important;
+  }
+
+  .mobile-dashboard-toggle {
+    display: block !important;
+    width: 100% !important;
+    min-height: 50px !important;
+    margin: 10px 0 12px !important;
+    padding: 14px 16px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255,255,255,.10) !important;
+    background: rgba(255,255,255,.08) !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+  }
+
+  .card,
+  .panel,
+  .widget,
+  .stat-card,
+  .goal-card,
+  .history-card,
+  .insight-card,
+  .account-card,
+  .bill-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 14px !important;
+    border-radius: 18px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .card h2,
+  .card h3,
+  .panel h2,
+  .panel h3,
+  .stat-card h2,
+  .stat-card h3,
+  .stat-label,
+  .account-title {
+    font-size: .8rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .value,
+  .money-value,
+  .amount,
+  .big-number,
+  .stat-value,
+  .account-value {
+    font-size: clamp(1.25rem, 7vw, 1.75rem) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -1px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  /* No celular, priorizar contas do mês. Esconde blocos analíticos pesados. */
+  .chart-container,
+  .calendar,
+  .calendar-wrapper,
+  .premium-insights,
+  .insights-grid,
+  .goals-preview,
+  .history-preview,
+  .gamification-preview,
+  .score-details,
+  .category-ranking,
+  .desktop-only {
+    display: none !important;
+  }
+
+  .accounts-section,
+  .bills-section,
+  .month-accounts,
+  .current-month-accounts,
+  .account-list,
+  .accounts-list,
+  .bills-list {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 12px !important;
+  }
+
+  .account-card .actions,
+  .bill-card .actions,
+  .account-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .account-card button,
+  .bill-card button,
+  .account-actions button {
+    width: 100% !important;
+    min-height: 44px !important;
+    padding: 10px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
+    --safe-x: 10px;
+  }
+
+  .topbar,
+  .toolbar,
+  .header-actions,
+  .top-actions,
+  .quick-actions {
+    grid-template-columns: 1fr 52px !important;
+  }
+
+  /* Renda e ocultar podem quebrar em duas linhas sem estourar */
+  .topbar button,
+  .toolbar button,
+  .header-actions button,
+  .top-actions button,
+  .quick-actions button {
+    height: 46px !important;
+    padding: 0 10px !important;
+    font-size: .82rem !important;
+  }
+
+  .dashboard-cards,
+  .financial-grid,
+  .stats-grid,
+  .summary-grid,
+  .cards {
+    grid-template-columns: 1fr !important;
+  }
+
+  .card,
+  .panel,
+  .widget,
+  .stat-card,
+  .account-card,
+  .bill-card {
+    padding: 13px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .logo-title,
+  .brand-title,
+  .app-title,
+  .hero-title,
+  header h1,
+  .app-header h1,
+  .hero h1,
+  .hero-section h1 {
+    font-size: 1.12rem !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+
+  .month-card,
+  .month-selector,
+  .month-navigation,
+  .month-nav {
+    grid-template-columns: 46px minmax(0, 1fr) 46px !important;
+  }
+
+  .month-card button,
+  .month-selector button,
+  .month-navigation button,
+  .month-nav button {
+    width: 46px !important;
+    min-width: 46px !important;
+    height: 46px !important;
   }
 }
 
