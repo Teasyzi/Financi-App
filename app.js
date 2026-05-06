@@ -7,7 +7,10 @@ import {
   salvarDadosWorkspace,
   criarConvite,
   entrarPorConvite,
-  extrairCodigoConvite
+  extrairCodigoConvite,
+  carregarPerfilUsuario,
+  salvarPerfilUsuario,
+  carregarMembrosWorkspace
 } from "./firebase.js";
 
 const $ = (id) => document.getElementById(id);
@@ -30,9 +33,11 @@ let currentUser = null;
 let workspaceId = null;
 let isCloudReady = false;
 let saveTimer = null;
+let currentProfile = null;
+let workspaceMembers = [];
 
 function defaultSalary(){return{name:'',gross:0,useINSS:true,showFGTS:true,useTransport:false,useFood:false,foodMode:'value',foodValue:0,useHealth:false,healthMode:'value',healthValue:0}}
-function defaultState(){return{version:6,accounts:[],paid:{},salary:{...defaultSalary(),manualExtra:0,useSecondSalary:false,second:{...defaultSalary()}}}}
+function defaultState(){return{version:7,accounts:[],paid:{},salary:{...defaultSalary(),manualExtra:0,useSecondSalary:false,second:{...defaultSalary()}}}}
 function normalizeSalary(raw={}){const base={...defaultSalary(),...raw};return{...base,manualExtra:toNumber(raw.manualExtra),useSecondSalary:!!raw.useSecondSalary,second:{...defaultSalary(),...(raw.second||{})}}}
 function loadState(){try{const raw=localStorage.getItem(STORE)||localStorage.getItem(PREVIOUS)||localStorage.getItem(LEGACY)||localStorage.getItem('financi-app-v31');const data=raw?JSON.parse(raw):defaultState();return{...defaultState(),...data,paid:data.paid||{},salary:normalizeSalary(data.salary||{})}}catch{return defaultState()}}
 function saveState(){
@@ -49,10 +54,28 @@ function showLoggedOut(){
   $('authScreen')?.classList.remove('hidden');
   $('appShell')?.classList.add('hidden');
 }
+function avatarFallback(name,email){
+  const base=(name||email||'U').trim();
+  return (base[0]||'U').toUpperCase();
+}
+function profilePhoto(profile,user){return profile?.photoURL||user?.photoURL||''}
+function applyProfileTheme(){
+  const theme=currentProfile?.theme||'dark';
+  document.documentElement.dataset.theme=theme;
+  document.body.classList.toggle('compact-mode',!!currentProfile?.compactMode);
+}
+function renderUserChip(){
+  const chip=$('userChip');
+  if(!chip)return;
+  const name=currentProfile?.name||currentUser?.displayName||currentUser?.email||'Logado';
+  const email=currentUser?.email||'';
+  const photo=profilePhoto(currentProfile,currentUser);
+  chip.innerHTML=`${photo?`<img src="${escapeHtml(photo)}" alt="">`:`<span class="chip-avatar">${escapeHtml(avatarFallback(name,email))}</span>`}<span>${escapeHtml(name)}</span>`;
+}
 function showLoggedIn(user){
   $('authScreen')?.classList.add('hidden');
   $('appShell')?.classList.remove('hidden');
-  if($('userChip'))$('userChip').textContent=user?.displayName||user?.email||'Logado';
+  renderUserChip();
 }
 function inviteLinkFromCode(code){return `${location.origin}${location.pathname}?convite=${encodeURIComponent(code)}`}
 async function initAuth(){
@@ -61,9 +84,9 @@ async function initAuth(){
     catch(err){$('authStatus').textContent='Não foi possível entrar com Google.';console.error(err)}
   });
   observarLogin(async(user)=>{
-    if(!user){currentUser=null;workspaceId=null;isCloudReady=false;showLoggedOut();return;}
+    if(!user){currentUser=null;currentProfile=null;workspaceMembers=[];workspaceId=null;isCloudReady=false;showLoggedOut();return;}
     try{
-      currentUser=user;showLoggedIn(user);setCloudStatus('Conectando ao Firebase...');
+      currentUser=user;currentProfile=await carregarPerfilUsuario(user.uid);applyProfileTheme();showLoggedIn(user);setCloudStatus('Conectando ao Firebase...');
       workspaceId=await garantirWorkspace(user);
       const urlCode=new URLSearchParams(location.search).get('convite');
       if(urlCode){workspaceId=await entrarPorConvite(urlCode,user);history.replaceState({},'',location.pathname);}
@@ -75,6 +98,8 @@ async function initAuth(){
         await salvarDadosWorkspace(workspaceId,state);
       }
       isCloudReady=true;
+      workspaceMembers=await carregarMembrosWorkspace(workspaceId).catch(()=>[]);
+      renderUserChip();
       setCloudStatus('Sincronização ativa. Compartilhe por convite para usar em casal.');
       render();
     }catch(err){
@@ -197,6 +222,74 @@ function salaryBlock(title,c){return`<div class="salary-person-preview"><strong>
 function updateSalaryPreview(){const old=state.salary;state.salary=readSalaryForm();$('secondSalarySection').classList.toggle('hidden',!state.salary.useSecondSalary);const c=salaryCalc();state.salary=old;const title1=c.first.name||'Salário 1';const title2=c.second?(c.second.name||'Salário 2'):'';$('salaryPreview').innerHTML=`${salaryBlock(title1,c.first)}${c.second?salaryBlock(title2,c.second):''}<div class="salary-total-preview"><div class="line"><span>Bruto total</span><b>${money(c.gross)}</b></div><div class="line"><span>Descontos totais</span><b>-${money(c.totalDeductions)}</b></div><div class="line"><span>FGTS total informativo</span><b>${money(c.fgts)}</b></div><div class="line"><span>Saldo manual extra</span><b>${money(c.manualExtra)}</b></div><div class="line total"><span>Líquido total usado pelo app</span><b>${money(c.net)}</b></div></div>`}
 function saveSettings(e){e.preventDefault();state.salary=readSalaryForm();saveState();$('settingsDialog').close();render()}
 
+
+function setProfilePreview(photo,name,email){
+  const img=$('profilePreviewImg');
+  if(!img)return;
+  const safeName=name||currentUser?.displayName||currentUser?.email||'Usuário';
+  const safeEmail=email||currentUser?.email||'';
+  $('profilePreviewName').textContent=safeName;
+  $('profilePreviewEmail').textContent=safeEmail;
+  if(photo){img.src=photo;img.classList.remove('empty-avatar');img.alt=`Foto de ${safeName}`;}
+  else{img.removeAttribute('src');img.classList.add('empty-avatar');img.alt='Sem foto';img.dataset.initial=avatarFallback(safeName,safeEmail);}
+}
+function renderProfileMembers(){
+  const box=$('profileMembers');
+  if(!box)return;
+  const members=workspaceMembers||[];
+  box.innerHTML=`<span class="eyebrow">Membros do controle compartilhado</span>${members.length?members.map(m=>`<div class="member-row">${m.photoURL?`<img src="${escapeHtml(m.photoURL)}" alt="">`:`<span>${escapeHtml(avatarFallback(m.name,m.email))}</span>`}<div><strong>${escapeHtml(m.name||'Membro')}</strong><small>${escapeHtml(m.nickname||m.email||'')}</small></div></div>`).join(''):'<div class="empty small-empty">Nenhum outro membro encontrado ainda.</div>'}`;
+}
+async function imageFileToDataUrl(file){
+  if(!file)return'';
+  if(!file.type.startsWith('image/'))throw new Error('Escolha um arquivo de imagem.');
+  const bitmap=await createImageBitmap(file);
+  const max=420;
+  const scale=Math.min(1,max/Math.max(bitmap.width,bitmap.height));
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.round(bitmap.width*scale);
+  canvas.height=Math.round(bitmap.height*scale);
+  const ctx=canvas.getContext('2d');
+  ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);
+  return canvas.toDataURL('image/jpeg',0.82);
+}
+function openProfile(){
+  const p=currentProfile||{};
+  const name=p.name||currentUser?.displayName||'';
+  const email=currentUser?.email||p.email||'';
+  const photo=p.photoURL||currentUser?.photoURL||'';
+  $('profileName').value=name;
+  $('profileNickname').value=p.nickname||'';
+  $('profileTheme').value=p.theme||'dark';
+  $('profileCompactMode').checked=!!p.compactMode;
+  $('profilePhotoUrl').value=photo && !photo.startsWith('data:') ? photo : '';
+  $('profilePhotoFile').value='';
+  setProfilePreview(photo,name,email);
+  renderProfileMembers();
+  $('profileDialog').showModal();
+}
+async function saveProfile(e){
+  e.preventDefault();
+  if(!currentUser)return;
+  const file=$('profilePhotoFile').files?.[0];
+  let photoURL=$('profilePhotoUrl').value.trim() || currentProfile?.photoURL || currentUser.photoURL || '';
+  try{
+    if(file) photoURL=await imageFileToDataUrl(file);
+    const profile={
+      name:$('profileName').value.trim()||currentUser.displayName||currentUser.email||'Usuário',
+      photoURL,
+      nickname:$('profileNickname').value.trim(),
+      theme:$('profileTheme').value,
+      compactMode:$('profileCompactMode').checked
+    };
+    currentProfile=await salvarPerfilUsuario(currentUser,profile);
+    workspaceMembers=await carregarMembrosWorkspace(workspaceId).catch(()=>workspaceMembers);
+    applyProfileTheme();
+    renderUserChip();
+    $('profileDialog').close();
+    setCloudStatus('Perfil atualizado com sucesso.');
+  }catch(err){console.error(err);alert(err.message||'Não consegui salvar o perfil.');}
+}
+
 function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`financi-backup-${iso(new Date())}.json`;a.click();URL.revokeObjectURL(a.href)}
 function importData(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!data||!Array.isArray(data.accounts))throw new Error('Arquivo inválido');state={...defaultState(),...data,paid:data.paid||{},salary:normalizeSalary(data.salary||{})};saveState();render();alert('Backup importado com sucesso.')}catch{alert('Não consegui importar este arquivo JSON.')}};r.readAsText(file)}
 
@@ -206,6 +299,7 @@ $('nextMonthBtn').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate
 $('monthPickerBtn').onclick=()=>$('monthPicker').classList.toggle('hidden');$('yearDownBtn').onclick=()=>{pickerYear--;renderMonthGrid()};$('yearUpBtn').onclick=()=>{pickerYear++;renderMonthGrid()};
 $('openAccountBtn').onclick=()=>openAccount();$('closeAccountBtn').onclick=closeAccount;$('cancelAccountBtn').onclick=closeAccount;$('accountForm').onsubmit=saveAccount;$('deleteAccountBtn').onclick=deleteAccount;
 $('openSettingsBtn').onclick=openSettings;$('closeSettingsBtn').onclick=()=>$('settingsDialog').close();$('cancelSettingsBtn').onclick=()=>$('settingsDialog').close();$('settingsForm').onsubmit=saveSettings;
+$('openProfileBtn')?.addEventListener('click',openProfile);$('closeProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('cancelProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('profileForm')?.addEventListener('submit',saveProfile);$('profilePhotoFile')?.addEventListener('change',async(e)=>{try{const url=await imageFileToDataUrl(e.target.files?.[0]);if(url)setProfilePreview(url,$('profileName').value,currentUser?.email)}catch(err){alert(err.message)}});$('profilePhotoUrl')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim(),$('profileName').value,currentUser?.email));$('profileName')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim()||currentProfile?.photoURL||currentUser?.photoURL,$('profileName').value,currentUser?.email));
 $('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>importData(e.target.files[0]);
 ['accountType','purchaseDate','firstPaymentDate','installments','installmentValue','fixedValue','cashValue','hasDifferentFirst','firstInstallmentValue','category'].forEach(id=>$(id).addEventListener('input',updateSmartForm));
 ['grossSalary','salaryName1','manualBalance','useSecondSalary','useINSS','showFGTS','useTransport','useFood','foodMode','foodValue','useHealth','healthMode','healthValue','grossSalary2','salaryName2','useINSS2','showFGTS2','useTransport2','useFood2','foodMode2','foodValue2','useHealth2','healthMode2','healthValue2'].forEach(id=>$(id).addEventListener('input',updateSalaryPreview));
@@ -233,7 +327,7 @@ $('joinInviteBtn')?.addEventListener('click',async()=>{
     workspaceId=await entrarPorConvite(code,currentUser);
     const remote=await carregarDadosWorkspace(workspaceId);
     if(remote&&Array.isArray(remote.accounts)){state={...defaultState(),...remote,paid:remote.paid||{},salary:normalizeSalary(remote.salary||{})};localStorage.setItem(STORE,JSON.stringify(state));}
-    isCloudReady=true;render();setCloudStatus('Você entrou no controle compartilhado com sucesso.');
+    isCloudReady=true;workspaceMembers=await carregarMembrosWorkspace(workspaceId).catch(()=>[]);render();setCloudStatus('Você entrou no controle compartilhado com sucesso.');
   }catch(err){console.error(err);setCloudStatus(err.message||'Não consegui entrar pelo convite.')}
 });
 

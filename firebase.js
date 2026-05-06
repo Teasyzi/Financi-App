@@ -4,7 +4,8 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  updateProfile
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 import {
   getFirestore,
@@ -144,4 +145,62 @@ export async function entrarPorConvite(texto, user) {
   }, { merge: true });
 
   return workspaceId;
+}
+
+
+export async function carregarPerfilUsuario(uid) {
+  if (!uid) return null;
+  const snap = await getDoc(doc(db, "users", uid));
+  return snap.exists() ? snap.data() : null;
+}
+
+export async function salvarPerfilUsuario(user, profile = {}) {
+  if (!user) throw new Error("Usuário não logado.");
+
+  const clean = {
+    uid: user.uid,
+    name: profile.name || user.displayName || "",
+    email: user.email || "",
+    photoURL: profile.photoURL || user.photoURL || "",
+    nickname: profile.nickname || "",
+    theme: profile.theme || "dark",
+    compactMode: !!profile.compactMode,
+    updatedAt: serverTimestamp()
+  };
+
+  await setDoc(doc(db, "users", user.uid), clean, { merge: true });
+
+  try {
+    await updateProfile(user, {
+      displayName: clean.name,
+      photoURL: clean.photoURL || null
+    });
+  } catch (err) {
+    console.warn("Perfil salvo no Firestore, mas não consegui atualizar Auth.", err);
+  }
+
+  return clean;
+}
+
+export async function carregarMembrosWorkspace(workspaceId) {
+  if (!workspaceId) return [];
+  const groupSnap = await getDoc(doc(db, "financeGroups", workspaceId));
+  if (!groupSnap.exists()) return [];
+
+  const group = groupSnap.data();
+  const memberIds = Object.keys(group.members || {});
+  const members = [];
+
+  for (const uid of memberIds) {
+    const profile = await carregarPerfilUsuario(uid);
+    members.push({
+      uid,
+      name: profile?.name || profile?.email || group.memberEmails?.[uid] || "Membro",
+      email: profile?.email || group.memberEmails?.[uid] || "",
+      photoURL: profile?.photoURL || "",
+      nickname: profile?.nickname || ""
+    });
+  }
+
+  return members;
 }

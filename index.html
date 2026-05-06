@@ -33,6 +33,7 @@
         <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
         <button class="ghost-btn" id="importBtn" type="button">Importar</button>
         <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
+        <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
         <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
       </div>
     </header>
@@ -135,6 +136,57 @@
       </aside>
     </main>
   </div>
+
+
+  <dialog id="profileDialog" class="modal">
+    <form id="profileForm" method="dialog" class="modal-card small profile-modal-card">
+      <div class="modal-head">
+        <div><span class="eyebrow">Perfil</span><h2>Personalização da conta</h2></div>
+        <button class="icon-btn" type="button" id="closeProfileBtn">×</button>
+      </div>
+
+      <div class="profile-preview">
+        <img id="profilePreviewImg" alt="Foto do perfil" />
+        <div>
+          <strong id="profilePreviewName">Usuário</strong>
+          <small id="profilePreviewEmail">conta Google</small>
+        </div>
+      </div>
+
+      <label class="field full">
+        <span>Nome de usuário</span>
+        <input id="profileName" type="text" maxlength="40" placeholder="Como você quer aparecer no app" />
+      </label>
+
+      <label class="field full">
+        <span>Foto de perfil</span>
+        <input id="profilePhotoFile" type="file" accept="image/*" />
+      </label>
+
+      <label class="field full">
+        <span>Ou usar link de imagem</span>
+        <input id="profilePhotoUrl" type="url" placeholder="https://..." />
+      </label>
+
+      <div class="form-grid">
+        <label class="field"><span>Apelido financeiro</span><input id="profileNickname" type="text" maxlength="30" placeholder="Ex: Responsável principal" /></label>
+        <label class="field"><span>Tema visual</span><select id="profileTheme"><option value="dark">Preto fosco</option><option value="blue">Azul premium</option><option value="green">Verde controle</option></select></label>
+      </div>
+
+      <label class="toggle-row">
+        <input id="profileCompactMode" type="checkbox" />
+        <span>Modo compacto para celular</span>
+      </label>
+
+      <div class="profile-members" id="profileMembers"></div>
+
+      <div class="modal-actions">
+        <span></span><span></span>
+        <button class="ghost-btn" type="button" id="cancelProfileBtn">Cancelar</button>
+        <button class="primary-btn" type="submit">Salvar perfil</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog id="accountDialog" class="modal">
     <form id="accountForm" method="dialog" class="modal-card">
