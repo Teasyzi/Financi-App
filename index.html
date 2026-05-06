@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#070a12" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -389,5 +389,121 @@
   </dialog>
   <input type="file" id="importFile" accept="application/json" hidden />
   <script type="module" src="app.js"></script>
+
+<script>
+(function () {
+  function closeMenusExcept(target) {
+    document.querySelectorAll('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer').forEach(function(menu) {
+      if (menu !== target) {
+        menu.classList.remove('open', 'active');
+        menu.removeAttribute('data-open');
+      }
+    });
+  }
+
+  function setupMobileMenuFix() {
+    var buttons = document.querySelectorAll('.mobile-menu-button, .menu-toggle, .hamburger, #menuToggle, button[aria-label="Menu"]');
+
+    buttons.forEach(function(btn) {
+      if (btn.dataset.mobileFixBound === 'true') return;
+      btn.dataset.mobileFixBound = 'true';
+
+      btn.addEventListener('click', function(e) {
+        setTimeout(function() {
+          var menu =
+            document.querySelector('.menu-dropdown') ||
+            document.querySelector('.dropdown-menu') ||
+            document.querySelector('.mobile-menu') ||
+            document.querySelector('.side-menu') ||
+            document.querySelector('.drawer');
+
+          if (!menu) return;
+
+          closeMenusExcept(menu);
+
+          var isOpen = menu.classList.contains('open') || menu.classList.contains('active') || menu.getAttribute('data-open') === 'true';
+
+          if (!isOpen) {
+            menu.classList.add('open');
+            menu.setAttribute('data-open', 'true');
+          }
+
+          document.documentElement.style.overflowX = 'hidden';
+          document.body.style.overflowX = 'hidden';
+        }, 0);
+      });
+    });
+  }
+
+  function createSummaryToggle() {
+    if (window.innerWidth > 768) return;
+    if (document.querySelector('.mobile-summary-toggle')) return;
+
+    var possibleStats =
+      document.querySelector('.dashboard-cards') ||
+      document.querySelector('.financial-grid') ||
+      document.querySelector('.stats-grid') ||
+      document.querySelector('.summary-grid');
+
+    if (!possibleStats) return;
+
+    var btn = document.createElement('button');
+    btn.className = 'mobile-summary-toggle';
+    btn.textContent = 'Mostrar/ocultar resumo completo';
+    btn.style.padding = '14px';
+    btn.style.borderRadius = '18px';
+    btn.style.border = '1px solid rgba(255,255,255,.10)';
+    btn.style.background = 'rgba(255,255,255,.08)';
+    btn.style.color = '#fff';
+    btn.style.fontWeight = '700';
+
+    possibleStats.parentNode.insertBefore(btn, possibleStats);
+
+    var collapsed = true;
+    function apply() {
+      var children = Array.from(possibleStats.children);
+      children.forEach(function(child, index) {
+        if (index > 1) child.style.display = collapsed ? 'none' : '';
+      });
+      btn.textContent = collapsed ? 'Mostrar resumo completo' : 'Ocultar resumo completo';
+    }
+
+    btn.addEventListener('click', function() {
+      collapsed = !collapsed;
+      apply();
+    });
+
+    apply();
+  }
+
+  function hardLimitWidth() {
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflowX = 'hidden';
+
+    if (window.innerWidth <= 768) {
+      document.querySelectorAll('body *').forEach(function(el) {
+        var rect = el.getBoundingClientRect();
+        if (rect.width > window.innerWidth + 8) {
+          el.style.maxWidth = '100vw';
+          el.style.minWidth = '0';
+          el.style.overflowX = 'hidden';
+        }
+      });
+    }
+  }
+
+  window.addEventListener('load', function() {
+    setupMobileMenuFix();
+    createSummaryToggle();
+    hardLimitWidth();
+    setTimeout(hardLimitWidth, 500);
+    setTimeout(hardLimitWidth, 2000);
+    setTimeout(setupMobileMenuFix, 2000);
+  });
+
+  window.addEventListener('resize', hardLimitWidth);
+})();
+</script>
+
 </body>
 </html>

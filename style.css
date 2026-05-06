@@ -87,289 +87,464 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
 
 @media(max-width:390px){.clean-actions{grid-template-columns:1fr auto auto!important}.clean-actions #toggleValuesBtn{grid-column:2/4}.menu-wrap{grid-column:4/5}.summary-grid,.summary-grid-five{grid-template-columns:1fr!important}.topbar>div:first-child{display:none}.topbar{padding-top:8px}.month-display small{display:none}}
 
+
 /* =========================================================
-   FINANCI APP V6.4 — CORREÇÃO MOBILE REAL
-   Corrige: largura estourando após carregar, menu ☰ quebrado e fundo do topo.
+   FINANCI APP V6.5 — MOBILE ULTRA CLEAN / ANTI-ESTOURO
+   Foco: celular, sem largura lateral, menos rolagem e contas mais cedo.
 ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box !important;
+}
 
 html,
 body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: clip !important;
+  margin: 0 !important;
+  padding: 0 !important;
   background:
-    radial-gradient(circle at top left, rgba(20, 120, 70, .55) 0%, rgba(8, 70, 45, .35) 26%, rgba(7, 10, 18, .96) 62%),
-    #070a12 !important;
+    radial-gradient(circle at top left, rgba(22, 101, 52, .62), rgba(2, 44, 34, .52) 26%, rgba(2, 6, 23, .98) 68%),
+    #020617 !important;
 }
 
-body,
-.app-shell,
+/* Trava qualquer elemento que esteja criando rolagem lateral */
+body > *,
+.app,
+.page,
+.wrapper,
+.container,
+main,
+.main,
+.content,
+.main-content,
+.dashboard,
+.dashboard-page,
+section,
+header,
+.app-header,
+.hero,
+.hero-section,
 .topbar,
-.layout,
-.main-panel,
-.side-panel,
-.card,
+.toolbar,
+.header-actions,
+.top-actions,
+.cards,
+.dashboard-cards,
+.financial-grid,
+.stats-grid,
 .month-card,
-.summary-grid,
-.premium-grid,
-.chart-grid,
-.section-card {
-  box-sizing: border-box;
+.month-selector,
+.calendar,
+.chart-container,
+.panel,
+.card,
+.account-card {
+  max-width: 100% !important;
+  min-width: 0 !important;
 }
 
-.app-shell {
-  width: 100%;
-  max-width: 1280px;
-  overflow-x: hidden;
-}
-
-.topbar {
+/* Remove fundos diferentes do topo */
+header,
+.app-header,
+.hero,
+.hero-section,
+.brand-area,
+.logo-area,
+.top-header {
   background: transparent !important;
+  background-color: transparent !important;
   box-shadow: none !important;
+  border-color: rgba(255,255,255,.08) !important;
 }
 
-.topbar > div:first-child,
-.topbar > div:first-child * {
-  background: transparent !important;
+/* Botões e cards mais consistentes */
+button,
+.btn,
+.action-btn,
+.card,
+.panel,
+.account-card,
+.stat-card,
+.goal-card,
+.history-card,
+.insight-card,
+.month-card,
+.month-selector {
+  border-radius: 22px;
 }
 
-.topbar > div:first-child h1 {
-  font-size: clamp(2.4rem, 9vw, 4.8rem);
-  line-height: .9;
-  letter-spacing: -.07em;
-  max-width: 100%;
-}
+/* =========================================================
+   MOBILE
+========================================================= */
 
-.topbar > div:first-child .eyebrow {
-  letter-spacing: .24em;
-}
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: hidden !important;
+  }
 
-/* Menu: fica suspenso, não empurra nem arrasta a tela */
-.menu-wrap {
-  position: relative;
-  width: max-content;
-}
+  body {
+    font-size: 15px;
+  }
 
-.overflow-menu {
-  position: absolute;
-  right: 0;
-  left: auto;
-  top: calc(100% + 10px);
-  z-index: 9999;
-}
-
-body.menu-open,
-body.modal-open {
-  overflow-x: hidden !important;
-}
-
-@media (max-width: 760px) {
-  .app-shell {
-    width: 100vw;
+  /* Garante que nada passe da tela */
+  body * {
     max-width: 100vw;
-    padding: 18px 12px 90px !important;
-    margin: 0 !important;
   }
 
-  .topbar {
-    position: relative !important;
-    top: auto !important;
-    display: block !important;
-    width: 100% !important;
-    margin: 0 0 18px 0 !important;
-    padding: 0 0 18px 0 !important;
-    border-bottom: 1px solid rgba(255,255,255,.10);
-    backdrop-filter: none !important;
-  }
-
-  .topbar > div:first-child {
-    width: 100%;
-    margin-bottom: 18px;
-  }
-
-  .topbar > div:first-child h1 {
-    font-size: clamp(3.05rem, 14vw, 4.5rem) !important;
-    line-height: .9 !important;
-    letter-spacing: -.08em !important;
-    white-space: normal !important;
-    word-break: keep-all !important;
-  }
-
-  .topbar > div:first-child .eyebrow {
-    font-size: .68rem !important;
-    letter-spacing: .22em !important;
-    margin-bottom: 10px !important;
-  }
-
-  .clean-actions,
-  .top-actions {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    gap: 10px !important;
-    justify-content: stretch !important;
-    align-items: stretch !important;
-  }
-
-  .user-chip {
-    width: max-content !important;
-    max-width: 100% !important;
-    justify-content: flex-start !important;
-    padding: 10px 14px !important;
-    border-radius: 999px !important;
-  }
-
-  .main-action,
-  .clean-actions > .ghost-btn:not(.menu-btn) {
-    width: 100% !important;
-    min-height: 54px !important;
-    justify-content: center !important;
-    text-align: center !important;
-    border-radius: 18px !important;
-    font-size: 1rem !important;
-  }
-
-  .menu-wrap {
-    width: max-content !important;
-    justify-self: start !important;
-  }
-
-  .menu-btn {
-    width: 58px !important;
-    height: 58px !important;
-    min-width: 58px !important;
-    border-radius: 18px !important;
-    font-size: 2rem !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  .overflow-menu {
-    position: absolute !important;
-    top: calc(100% + 10px) !important;
-    left: 0 !important;
-    right: auto !important;
-    width: min(280px, calc(100vw - 24px)) !important;
-    max-width: calc(100vw - 24px) !important;
-    padding: 12px !important;
-    border-radius: 22px !important;
-    background: rgba(15, 23, 42, .98) !important;
-    box-shadow: 0 24px 70px rgba(0,0,0,.55) !important;
-  }
-
-  .overflow-menu .ghost-btn {
-    width: 100% !important;
-    min-height: 46px !important;
-    text-align: left !important;
-    justify-content: flex-start !important;
-  }
-
-  .layout {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
+  .app,
+  .page,
+  .wrapper,
+  .container,
+  main,
+  .main,
+  .content,
+  .main-content,
+  .dashboard,
+  .dashboard-page {
+    width: 100vw !important;
+    max-width: 100vw !important;
     overflow-x: hidden !important;
-  }
-
-  .main-panel,
-  .side-panel {
-    width: 100% !important;
-    max-width: 100% !important;
-    display: grid !important;
-    gap: 14px !important;
-    overflow-x: hidden !important;
-  }
-
-  .side-panel {
-    margin-top: 14px !important;
-  }
-
-  .card,
-  .section-card,
-  .metric,
-  .health-card,
-  .month-card {
-    width: 100% !important;
-    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
 
-  .month-card {
+  /* Topo compacto */
+  .app-header,
+  .hero,
+  .hero-section,
+  header {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    padding: 18px 12px 14px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .logo-title,
+  .brand-title,
+  .app-title,
+  .hero-title,
+  h1 {
+    font-size: clamp(2.2rem, 12vw, 3.1rem) !important;
+    line-height: .95 !important;
+    letter-spacing: -2px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .subtitle,
+  .app-subtitle,
+  .brand-subtitle,
+  .hero-subtitle {
+    font-size: .64rem !important;
+    letter-spacing: 2px !important;
+  }
+
+  /* Barra superior em grid compacto: Perfil | Renda | Ocultar | Menu */
+  .topbar,
+  .toolbar,
+  .header-actions,
+  .top-actions,
+  .quick-actions {
+    width: 100% !important;
     display: grid !important;
-    grid-template-columns: 56px minmax(0, 1fr) 56px !important;
+    grid-template-columns: minmax(0, 1fr) auto auto auto !important;
+    align-items: center !important;
     gap: 8px !important;
-    padding: 10px !important;
-    border-radius: 24px !important;
-    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 0 14px 0 !important;
+    overflow: visible !important;
   }
 
-  .month-display {
+  .profile-chip,
+  .user-chip,
+  .profile-button,
+  .user-profile {
+    max-width: 100% !important;
     min-width: 0 !important;
+    padding: 8px 10px !important;
+    height: 44px !important;
     overflow: hidden !important;
   }
 
-  .month-display span {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 1.55rem !important;
+  .profile-chip img,
+  .user-chip img,
+  .profile-button img,
+  .user-profile img {
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 30px !important;
   }
 
-  .month-display small {
+  .profile-chip span,
+  .user-chip span,
+  .profile-button span,
+  .user-profile span {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Botões visíveis do topo menores */
+  .topbar button,
+  .toolbar button,
+  .header-actions button,
+  .top-actions button,
+  .quick-actions button {
+    width: auto !important;
+    min-width: 48px !important;
+    max-width: 150px !important;
+    height: 48px !important;
+    padding: 0 14px !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    font-size: .95rem !important;
+  }
+
+  .mobile-menu-button,
+  .menu-toggle,
+  .hamburger,
+  #menuToggle,
+  button[aria-label="Menu"] {
+    width: 48px !important;
+    min-width: 48px !important;
+    height: 48px !important;
+    padding: 0 !important;
+    font-size: 1.4rem !important;
+  }
+
+  /* Menu abre como gaveta centralizada, não empurrando o layout */
+  .menu-dropdown,
+  .dropdown-menu,
+  .mobile-menu,
+  .side-menu,
+  .drawer {
+    position: fixed !important;
+    top: 86px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 110px) !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    transform: none !important;
+    margin: 0 !important;
+    border-radius: 22px !important;
+    background: rgba(15, 23, 42, .96) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    box-shadow: 0 24px 80px rgba(0,0,0,.45) !important;
+  }
+
+  .menu-dropdown:not(.open):not(.active):not([data-open="true"]),
+  .dropdown-menu:not(.open):not(.active):not([data-open="true"]),
+  .mobile-menu:not(.open):not(.active):not([data-open="true"]),
+  .side-menu:not(.open):not(.active):not([data-open="true"]),
+  .drawer:not(.open):not(.active):not([data-open="true"]) {
     display: none !important;
   }
 
-  .nav-arrow {
-    width: 46px !important;
-    height: 46px !important;
-    min-width: 46px !important;
-    border-radius: 16px !important;
-  }
-
-  .summary-grid,
-  .summary-grid-five,
-  .premium-grid,
-  .chart-grid {
+  /* Mês compacto e sem largura lateral */
+  .month-card,
+  .month-selector,
+  .month-navigation,
+  .month-nav {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
     display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-
-  .metric strong,
-  .money-value,
-  .value,
-  .big-number {
-    font-size: clamp(1.7rem, 8vw, 2.35rem) !important;
-    line-height: 1.05 !important;
-  }
-
-  .calendar-card,
-  .charts-card {
+    grid-template-columns: 52px 1fr 52px !important;
+    gap: 8px !important;
+    align-items: center !important;
+    padding: 10px !important;
     overflow: hidden !important;
   }
 
-  .calendar-grid,
-  .chart-grid,
-  .bar-chart {
+  .month-card button,
+  .month-selector button,
+  .month-navigation button,
+  .month-nav button {
+    width: 52px !important;
+    min-width: 52px !important;
+    height: 52px !important;
+    padding: 0 !important;
+  }
+
+  .month-card h2,
+  .month-selector h2,
+  .month-navigation h2,
+  .month-nav h2,
+  .month-title {
+    font-size: 1.35rem !important;
+    text-align: center !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  /* Cards principais em formato compacto */
+  .cards,
+  .dashboard-cards,
+  .financial-grid,
+  .stats-grid,
+  .summary-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .card,
+  .panel,
+  .widget,
+  .stat-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  .card h2,
+  .card h3,
+  .panel h2,
+  .panel h3,
+  .stat-card h2,
+  .stat-card h3,
+  .card label,
+  .stat-label {
+    font-size: .78rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .value,
+  .money-value,
+  .amount,
+  .big-number,
+  .stat-value {
+    font-size: clamp(1.25rem, 8vw, 1.8rem) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -1px !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  /* Esconde excesso no topo para contas aparecerem mais cedo */
+  .mobile-secondary,
+  .desktop-only,
+  .chart-container,
+  .calendar,
+  .calendar-wrapper,
+  .premium-insights,
+  .insights-grid,
+  .goals-preview,
+  .history-preview,
+  .gamification-preview,
+  .score-details,
+  .category-ranking {
+    display: none !important;
+  }
+
+  /* Mostra áreas importantes */
+  .accounts-section,
+  .bills-section,
+  .month-accounts,
+  .current-month-accounts,
+  .account-list,
+  .accounts-list {
+    display: block !important;
+    width: 100% !important;
     max-width: 100% !important;
-    overflow-x: auto !important;
+    margin-top: 16px !important;
+  }
+
+  .account-card,
+  .bill-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 14px !important;
+    margin: 0 0 10px 0 !important;
+  }
+
+  .account-card .actions,
+  .bill-card .actions,
+  .account-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .account-card button,
+  .bill-card button,
+  .account-actions button {
+    width: 100% !important;
+    min-height: 44px !important;
+    padding: 10px !important;
+  }
+
+  /* Botão/área "mostrar resumo completo" */
+  .mobile-summary-toggle {
+    display: block !important;
+    width: 100% !important;
+    margin: 10px 0 14px !important;
+  }
+
+  /* Evita qualquer translate antigo de menu lateral */
+  .open,
+  .active {
+    max-width: 100vw;
   }
 }
 
-@media (max-width: 390px) {
-  .topbar > div:first-child h1 {
-    font-size: clamp(2.8rem, 13vw, 3.7rem) !important;
+@media (max-width: 430px) {
+  .topbar,
+  .toolbar,
+  .header-actions,
+  .top-actions,
+  .quick-actions {
+    grid-template-columns: 1fr auto auto !important;
   }
 
-  .app-shell {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
+  .topbar button,
+  .toolbar button,
+  .header-actions button,
+  .top-actions button,
+  .quick-actions button {
+    height: 46px !important;
+    padding: 0 12px !important;
+    font-size: .88rem !important;
+  }
+
+  .cards,
+  .dashboard-cards,
+  .financial-grid,
+  .stats-grid,
+  .summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* No celular pequeno, deixa cards ainda menores */
+  .card,
+  .panel,
+  .widget,
+  .stat-card {
+    min-height: auto !important;
+    padding: 13px !important;
+  }
+
+  .value,
+  .money-value,
+  .amount,
+  .big-number,
+  .stat-value {
+    font-size: 1.65rem !important;
   }
 }
+
