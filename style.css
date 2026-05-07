@@ -2298,3 +2298,81 @@ body:not(.financi-login-mode) #appShell > header.topbar.new-app-header {
   #appShell .new-app-header #toggleValuesBtn { min-width: 68px !important; max-width: 78px !important; }
   #appShell .new-app-header #moreMenuBtn { width: 44px !important; min-width: 44px !important; max-width: 44px !important; }
 }
+
+/* =========================================================
+   V73 - CORREÇÃO DEFINITIVA DOS TEMAS DO PERFIL
+   O CSS antigo tinha background com !important no body,
+   então trocar o select salvava, mas visualmente não mudava.
+========================================================= */
+html[data-theme="dark"] {
+  --bg:#070a12;
+  --panel:#101827;
+  --panel-2:#151f32;
+  --accent:#3b82f6;
+  --accent-2:#60a5fa;
+  --theme-glow:rgba(59,130,246,.18);
+}
+html[data-theme="blue"] {
+  --bg:#061324;
+  --panel:#0d1b2f;
+  --panel-2:#10233d;
+  --accent:#60a5fa;
+  --accent-2:#7dd3fc;
+  --theme-glow:rgba(96,165,250,.22);
+}
+html[data-theme="green"] {
+  --bg:#031b12;
+  --panel:#0d211b;
+  --panel-2:#123026;
+  --accent:#22c55e;
+  --accent-2:#86efac;
+  --theme-glow:rgba(34,197,94,.22);
+}
+
+html[data-theme="dark"] body:not(.financi-login-mode) {
+  background:
+    radial-gradient(circle at top left, var(--theme-glow), transparent 34rem),
+    linear-gradient(145deg,#070a12 0%,#0b1020 52%,#020617 100%) !important;
+}
+html[data-theme="blue"] body:not(.financi-login-mode) {
+  background:
+    radial-gradient(circle at top left, var(--theme-glow), transparent 34rem),
+    linear-gradient(145deg,#061324 0%,#08111f 50%,#020617 100%) !important;
+}
+html[data-theme="green"] body:not(.financi-login-mode) {
+  background:
+    radial-gradient(circle at top left, var(--theme-glow), transparent 34rem),
+    linear-gradient(145deg,#06472c 0%,#042d21 48%,#020617 100%) !important;
+}
+
+html[data-theme] .primary-btn,
+html[data-theme] .month-option.active {
+  background: linear-gradient(135deg,var(--accent),var(--accent-2)) !important;
+}
+html[data-theme] input:focus,
+html[data-theme] select:focus {
+  border-color: color-mix(in srgb, var(--accent) 76%, white 10%) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent) !important;
+}
+html[data-theme] .filter-btn.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent) !important;
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent) !important;
+}
+html[data-theme] .score-circle {
+  background: radial-gradient(circle,color-mix(in srgb, var(--accent) 30%, transparent),rgba(15,23,42,.92)) !important;
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent) !important;
+}
+
+@media (max-width:700px) {
+  html[data-theme="dark"] body:not(.financi-login-mode),
+  html[data-theme="blue"] body:not(.financi-login-mode),
+  html[data-theme="green"] body:not(.financi-login-mode) {
+    background:
+      radial-gradient(circle at top left, var(--theme-glow), transparent 26rem),
+      linear-gradient(145deg,var(--bg) 0%,#06130f 52%,#020617 100%) !important;
+  }
+}
+
+/* v74: remove blocos não utilizados e deixa a área de IA ocupar toda a largura */
+.premium-grid-single{grid-template-columns:1fr!important;}
+.score-card,.timeline-card,.achievements-card,.gamification-preview,.score-details{display:none!important;}
