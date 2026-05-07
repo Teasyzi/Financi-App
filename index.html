@@ -2,31 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#070a12" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Financi App" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=71" />
-  <style>
-    #appShell.hidden, #authScreen.hidden { display: none !important; }
-    body:has(#authScreen:not(.hidden)) #appShell,
-    body:has(#authScreen:not(.hidden)) header.topbar,
-    body:has(#authScreen:not(.hidden)) .ffh-actions,
-    body:has(#authScreen:not(.hidden)) .ffh-menu,
-    body:has(#authScreen:not(.hidden)) #financiFixedHeader { display:none !important; }
-  </style>
-  <script>
-    (function(){
-      if ('caches' in window) caches.keys().then(function(keys){ keys.forEach(function(k){ if(/^financi-app-/.test(k)) caches.delete(k); }); });
-      if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function(rs){ rs.forEach(function(r){ r.unregister(); }); });
-    })();
-  </script>
-
-  <title>Financi App V6.2 Mobile Clean</title>
+  <link rel="stylesheet" href="style.css" />
+  <title>Financi App</title>
 </head>
-<body class="financi-login-mode">
+<body>
   <section class="auth-screen" id="authScreen">
     <div class="auth-card card">
       <span class="eyebrow">Financi App seguro</span>
@@ -38,29 +23,20 @@
   </section>
 
   <div class="app-shell hidden" id="appShell">
-    <header class="topbar new-app-header" aria-label="Cabeçalho principal">
-      <div class="new-brand" aria-label="Financi App">
-        <span class="new-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="new-brand-text">Financi</span>
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">Controle financeiro pessoal</span>
+        <h1>Financi App</h1>
       </div>
-
-      <nav class="top-actions clean-actions new-header-actions" aria-label="Ações principais">
+      <div class="top-actions">
         <div class="user-chip" id="userChip">Offline</div>
-        <button class="ghost-btn main-action" id="openSettingsBtn" type="button">Renda</button>
-        <button class="ghost-btn main-action" id="toggleValuesBtn" type="button">Ocultar</button>
-        <div class="menu-wrap">
-          <button class="ghost-btn menu-btn" id="moreMenuBtn" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
-          <div class="overflow-menu hidden" id="overflowMenu">
-            <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
-            <button class="ghost-btn" id="openSecurityBtn" type="button">Segurança</button>
-            <button class="ghost-btn" id="openGroupBtn" type="button">Grupo / Família</button>
-            <button class="ghost-btn" id="exportBtn" type="button">Exportar backup</button>
-            <button class="ghost-btn" id="importBtn" type="button">Importar backup</button>
-            <button class="ghost-btn" id="lockAppBtn" type="button">Bloquear app</button>
-            <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
-          </div>
-        </div>
-      </nav>
+        <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
+        <button class="ghost-btn" id="importBtn" type="button">Importar</button>
+        <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
+        <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
+        <button class="ghost-btn" id="openGroupBtn" type="button">Grupo</button>
+        <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
+      </div>
     </header>
 
     <main class="layout">
@@ -90,32 +66,6 @@
           <article class="metric card"><span>Contas ativas</span><strong id="activeAccounts">0</strong></article>
           <article class="metric card"><span>Risco financeiro</span><strong id="riskMetric">0%</strong></article>
         </section>
-
-        <section class="premium-grid premium-grid-single">
-          <article class="card section-card">
-            <div class="section-title compact"><div><span class="eyebrow">IA financeira</span><h2>Diagnósticos e sugestões</h2></div></div>
-            <div id="aiInsights" class="ai-list"></div>
-          </article>
-        </section>
-
-        <section class="card section-card charts-card">
-          <div class="section-title compact"><div><span class="eyebrow">Dashboard premium</span><h2>Gráficos e ranking</h2></div></div>
-          <div class="chart-grid">
-            <div><h3>Gastos por categoria</h3><div id="categoryChart" class="bar-chart"></div></div>
-            <div><h3>Renda x dívida</h3><div id="incomeDebtChart" class="bar-chart"></div></div>
-            <div><h3>Parcelas futuras</h3><div id="futureChart" class="bar-chart"></div></div>
-          </div>
-          <div id="categoryRanking" class="ranking-list"></div>
-        </section>
-
-        <section class="card section-card goals-card">
-          <div class="section-title">
-            <div><span class="eyebrow">Metas e sonhos</span><h2>Objetivos financeiros</h2></div>
-            <button class="primary-btn" id="openGoalBtn" type="button">+ Criar meta</button>
-          </div>
-          <div id="goalsList" class="goals-list"></div>
-        </section>
-
 
         <section class="card section-card calendar-card">
           <div class="section-title compact">
@@ -194,54 +144,6 @@
       </aside>
     </main>
   </div>
-
-
-  <dialog id="goalDialog" class="modal">
-    <form id="goalForm" method="dialog" class="modal-card small">
-      <div class="modal-head">
-        <div><span class="eyebrow">Metas e sonhos</span><h2 id="goalDialogTitle">Nova meta</h2></div>
-        <button class="icon-btn" type="button" id="closeGoalBtn">×</button>
-      </div>
-      <input id="goalId" type="hidden" />
-      <label class="field full"><span>Nome da meta</span><input id="goalName" type="text" placeholder="Reserva de emergência" required /></label>
-      <div class="form-grid">
-        <label class="field"><span>Valor alvo</span><input id="goalTarget" type="number" min="0" step="0.01" placeholder="10000" required /></label>
-        <label class="field"><span>Valor guardado</span><input id="goalSaved" type="number" min="0" step="0.01" placeholder="2450" /></label>
-        <label class="field"><span>Prazo desejado</span><input id="goalDeadline" type="date" /></label>
-        <label class="field"><span>Prioridade</span><select id="goalPriority"><option>Alta</option><option>Média</option><option>Baixa</option></select></label>
-      </div>
-      <div class="calc-preview" id="goalPreview">A previsão será calculada com base na sobra mensal.</div>
-      <div class="modal-actions">
-        <button class="danger-btn hidden" id="deleteGoalBtn" type="button">Excluir</button>
-        <span></span>
-        <button class="ghost-btn" id="cancelGoalBtn" type="button">Cancelar</button>
-        <button class="primary-btn" type="submit">Salvar meta</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="securityDialog" class="modal">
-    <form id="securityForm" method="dialog" class="modal-card small">
-      <div class="modal-head">
-        <div><span class="eyebrow">Segurança premium</span><h2>PIN e privacidade</h2></div>
-        <button class="icon-btn" type="button" id="closeSecurityBtn">×</button>
-      </div>
-      <label class="toggle-row"><input id="enablePin" type="checkbox" /> <span>Ativar PIN local neste aparelho</span></label>
-      <label class="field full"><span>PIN de 4 a 8 números</span><input id="pinValue" type="password" inputmode="numeric" maxlength="8" placeholder="****" /></label>
-      <label class="toggle-row"><input id="autoLock" type="checkbox" /> <span>Bloquear automaticamente ao abrir o app</span></label>
-      <label class="toggle-row"><input id="hideValuesSetting" type="checkbox" /> <span>Iniciar com valores ocultos</span></label>
-      <div class="modal-actions"><span></span><button class="ghost-btn" id="cancelSecurityBtn" type="button">Cancelar</button><button class="primary-btn" type="submit">Salvar segurança</button></div>
-    </form>
-  </dialog>
-
-  <dialog id="lockDialog" class="modal lock-modal">
-    <form id="unlockForm" method="dialog" class="modal-card small">
-      <div class="modal-head"><div><span class="eyebrow">App bloqueado</span><h2>Digite seu PIN</h2></div></div>
-      <label class="field full"><span>PIN</span><input id="unlockPin" type="password" inputmode="numeric" maxlength="8" autofocus /></label>
-      <small id="unlockStatus"></small>
-      <div class="modal-actions"><span></span><button class="primary-btn" type="submit">Desbloquear</button></div>
-    </form>
-  </dialog>
 
   <dialog id="groupDialog" class="modal">
     <div class="modal-card small group-modal-card">
@@ -390,135 +292,6 @@
     </form>
   </dialog>
   <input type="file" id="importFile" accept="application/json" hidden />
-  <script type="module" src="app.js?v=71"></script>
-
-
-
-
-
-
-
-
-
-
-
-<script>
-(function () {
-  function q(sel) { return document.querySelector(sel); }
-  function qa(sel) { return Array.from(document.querySelectorAll(sel)); }
-  function txt(el) { return (el && (el.innerText || el.textContent) || '').trim().toLowerCase(); }
-
-  function detectLoginMode() {
-    var bodyText = txt(document.body);
-    var hasGoogleLogin = bodyText.includes('entre com google') || bodyText.includes('entrar com google') || bodyText.includes('faça login') || bodyText.includes('faca login');
-    var hasMonth = bodyText.includes('janeiro') || bodyText.includes('fevereiro') || bodyText.includes('março') || bodyText.includes('marco') || bodyText.includes('abril') || bodyText.includes('maio') || bodyText.includes('junho') || bodyText.includes('julho') || bodyText.includes('agosto') || bodyText.includes('setembro') || bodyText.includes('outubro') || bodyText.includes('novembro') || bodyText.includes('dezembro');
-
-    if (hasGoogleLogin && !hasMonth) {
-      document.body.classList.add('financi-login-mode');
-    } else {
-      document.body.classList.remove('financi-login-mode');
-    }
-  }
-
-  function setupMenu() {
-    qa('.mobile-menu-button, .menu-toggle, .hamburger, #menuToggle, button[aria-label="Menu"]').forEach(function(btn) {
-      if (btn.dataset.v69Menu === '1') return;
-      btn.dataset.v69Menu = '1';
-
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        var menu = q('.menu-dropdown') || q('.dropdown-menu') || q('.mobile-menu') || q('.side-menu') || q('.drawer');
-        if (!menu) return;
-
-        var opened = menu.classList.contains('open') || menu.classList.contains('active') || menu.getAttribute('data-open') === 'true';
-
-        qa('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer').forEach(function(m) {
-          m.classList.remove('open', 'active');
-          m.removeAttribute('data-open');
-        });
-
-        if (!opened) {
-          menu.classList.add('open');
-          menu.setAttribute('data-open', 'true');
-        }
-      });
-    });
-
-    document.addEventListener('click', function(e) {
-      if (e.target.closest('.mobile-menu-button, .menu-toggle, .hamburger, #menuToggle, button[aria-label="Menu"]')) return;
-      if (e.target.closest('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer')) return;
-
-      qa('.menu-dropdown, .dropdown-menu, .mobile-menu, .side-menu, .drawer').forEach(function(menu) {
-        menu.classList.remove('open', 'active');
-        menu.removeAttribute('data-open');
-      });
-    });
-  }
-
-  function setupDashboardCollapse() {
-    if (window.innerWidth > 900) {
-      document.body.classList.remove('dashboard-mobile-collapsed');
-      return;
-    }
-
-    document.body.classList.add('dashboard-mobile-collapsed');
-
-    if (q('.mobile-dashboard-toggle')) return;
-
-    var grid = q('.dashboard-cards') || q('.financial-grid') || q('.stats-grid') || q('.summary-grid') || q('.cards');
-    if (!grid) return;
-
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'mobile-dashboard-toggle';
-    btn.textContent = 'Mostrar dashboard';
-    grid.parentNode.insertBefore(btn, grid);
-
-    btn.addEventListener('click', function() {
-      document.body.classList.toggle('dashboard-mobile-collapsed');
-      btn.textContent = document.body.classList.contains('dashboard-mobile-collapsed')
-        ? 'Mostrar dashboard'
-        : 'Ocultar dashboard';
-    });
-  }
-
-  function removeInjectedHeaderIfAny() {
-    var injected = document.getElementById('financiFixedHeader');
-    if (injected) injected.remove();
-  }
-
-  function init() {
-    removeInjectedHeaderIfAny();
-    detectLoginMode();
-    setupMenu();
-    setupDashboardCollapse();
-    document.documentElement.style.overflowX = 'hidden';
-    document.body.style.overflowX = 'hidden';
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
-  window.addEventListener('load', function() {
-    init();
-    setTimeout(detectLoginMode, 800);
-    setTimeout(detectLoginMode, 2000);
-  });
-
-  window.addEventListener('resize', setupDashboardCollapse);
-
-  var observer = new MutationObserver(function() {
-    detectLoginMode();
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-})();
-</script>
-
+  <script type="module" src="app.js"></script>
 </body>
 </html>

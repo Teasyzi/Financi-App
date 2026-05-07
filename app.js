@@ -40,11 +40,10 @@ let workspaceMembers = [];
 let currentGroup = null;
 
 function defaultSalary(){return{name:'',gross:0,useINSS:true,showFGTS:true,useTransport:false,useFood:false,foodMode:'value',foodValue:0,useHealth:false,healthMode:'value',healthValue:0}}
-function defaultState(){return{version:8,accounts:[],paid:{},goals:[],history:[],security:{pin:'',enabled:false,autoLock:false,hideValues:false},salary:{...defaultSalary(),manualExtra:0,useSecondSalary:false,second:{...defaultSalary()}}}}
+function defaultState(){return{version:7,accounts:[],paid:{},salary:{...defaultSalary(),manualExtra:0,useSecondSalary:false,second:{...defaultSalary()}}}}
 function normalizeSalary(raw={}){const base={...defaultSalary(),...raw};return{...base,manualExtra:toNumber(raw.manualExtra),useSecondSalary:!!raw.useSecondSalary,second:{...defaultSalary(),...(raw.second||{})}}}
-function loadState(){try{const raw=localStorage.getItem(STORE)||localStorage.getItem(PREVIOUS)||localStorage.getItem(LEGACY)||localStorage.getItem('financi-app-v31');const data=raw?JSON.parse(raw):defaultState();return{...defaultState(),...data,paid:data.paid||{},goals:data.goals||[],history:data.history||[],security:{...defaultState().security,...(data.security||{})},salary:normalizeSalary(data.salary||{})}}catch{return defaultState()}}
+function loadState(){try{const raw=localStorage.getItem(STORE)||localStorage.getItem(PREVIOUS)||localStorage.getItem(LEGACY)||localStorage.getItem('financi-app-v31');const data=raw?JSON.parse(raw):defaultState();return{...defaultState(),...data,paid:data.paid||{},salary:normalizeSalary(data.salary||{})}}catch{return defaultState()}}
 function saveState(){
-  state.history = buildHistorySnapshot();
   localStorage.setItem(STORE,JSON.stringify(state));
   if(isCloudReady && workspaceId){
     clearTimeout(saveTimer);
@@ -55,7 +54,6 @@ function saveState(){
 }
 function setCloudStatus(text){const el=$('shareStatus');if(el)el.textContent=text}
 function showLoggedOut(){
-  document.body.classList.add('financi-login-mode');
   $('authScreen')?.classList.remove('hidden');
   $('appShell')?.classList.add('hidden');
 }
@@ -78,7 +76,6 @@ function renderUserChip(){
   chip.innerHTML=`${photo?`<img src="${escapeHtml(photo)}" alt="">`:`<span class="chip-avatar">${escapeHtml(avatarFallback(name,email))}</span>`}<span>${escapeHtml(name)}</span>`;
 }
 function showLoggedIn(user){
-  document.body.classList.remove('financi-login-mode');
   $('authScreen')?.classList.add('hidden');
   $('appShell')?.classList.remove('hidden');
   renderUserChip();
@@ -109,7 +106,6 @@ async function initAuth(){
       renderUserChip();
       setCloudStatus('Sincronização ativa. Compartilhe por convite para usar em casal.');
       render();
-      maybeLockOnStart();
     }catch(err){
       console.error(err);
       isCloudReady=false;
@@ -144,31 +140,6 @@ function statusForDue(due){const today=new Date();today.setHours(0,0,0,0);const 
 function accountStatus(a,date){const p=getPaymentForMonth(a,date);if(p)return'current';if(a.type==='installment'){const first=parseDate(a.firstPaymentDate||a.purchaseDate);const end=addMonthsSafe(a.firstPaymentDate||a.purchaseDate,(a.installments||1)-1);if(first&&date<new Date(first.getFullYear(),first.getMonth(),1))return'future';if(end&&date>new Date(end.getFullYear(),end.getMonth(),1))return'finished'}if(a.type==='single'){const d=parseDate(a.purchaseDate);if(d&&date<new Date(d.getFullYear(),d.getMonth(),1))return'future';if(d&&date>new Date(d.getFullYear(),d.getMonth(),1))return'finished'}return'future'}
 function estimateMonthlyRate(principal,payments){if(!principal||payments.length<2)return null;let low=-.99,high=1.5;const npv=r=>payments.reduce((acc,p,idx)=>acc+p/Math.pow(1+r,idx+1),0)-principal;if(npv(low)*npv(high)>0)return null;for(let i=0;i<90;i++){const mid=(low+high)/2;if(npv(mid)>0)low=mid;else high=mid}return(low+high)/2}
 function interestInfo(a){if(a.type!=='installment'||!a.cashValue)return null;const total=accountTotalPaid(a);const interest=total-a.cashValue;const totalPercent=a.cashValue>0?(interest/a.cashValue)*100:0;const payments=Array.from({length:a.installments||1},(_,i)=>i===0&&a.hasDifferentFirst?(a.firstInstallmentValue||a.installmentValue||0):(a.installmentValue||0));const monthlyRate=estimateMonthlyRate(a.cashValue,payments);const avg=total/payments.length;const noInterest=a.cashValue/payments.length;const installmentUplift=noInterest?((avg/noInterest)-1)*100:0;let level='Baixo',cls='badge-good';if(monthlyRate!==null&&monthlyRate>.035){level='Abusivo';cls='badge-bad'}else if(monthlyRate!==null&&monthlyRate>.018){level='Médio';cls='badge-warn'}return{total,interest,totalPercent,monthlyRate,installmentUplift,level,cls}}
-
-
-
-function currentMonthPayments(date=viewDate){return state.accounts.map(a=>({account:a,payment:getPaymentForMonth(a,date)})).filter(x=>x.payment)}
-function monthTotals(date=viewDate){const ps=currentMonthPayments(date);const total=ps.reduce((s,x)=>s+x.payment.value,0);const paid=ps.filter(x=>isPaymentPaid(x.account,x.payment,date)).reduce((s,x)=>s+x.payment.value,0);return{payments:ps,total,paid,unpaid:total-paid}}
-function categoryTotals(payments){return payments.reduce((acc,x)=>{const c=x.account.category||'Outros';acc[c]=(acc[c]||0)+x.payment.value;return acc},{})}
-function calcFinanceScore(commitment,balance,paidRate,goalsRate){let score=100;if(commitment>30)score-=Math.min(35,(commitment-30)*0.9);if(commitment>50)score-=18;if(balance<0)score-=25;if(paidRate<80)score-=Math.min(18,(80-paidRate)*0.3);score+=Math.min(8,goalsRate*0.08);return Math.max(0,Math.min(100,Math.round(score)))}
-function buildPremiumMetrics(){const salary=salaryCalc();const mt=monthTotals();const commitment=salary.net?mt.total/salary.net*100:0;const balance=salary.net-mt.total;const paidRate=mt.total?mt.paid/mt.total*100:100;const goalTotals=state.goals.reduce((a,g)=>{a.saved+=toNumber(g.saved);a.target+=toNumber(g.target);return a},{saved:0,target:0});const goalsRate=goalTotals.target?goalTotals.saved/goalTotals.target*100:0;return{salary,...mt,commitment,balance,paidRate,goalsRate,score:calcFinanceScore(commitment,balance,paidRate,goalsRate)}}
-function monthsToGoal(goal,monthlyLeft){const remaining=Math.max(0,toNumber(goal.target)-toNumber(goal.saved));if(!remaining)return 0;if(monthlyLeft<=0)return null;return Math.ceil(remaining/monthlyLeft)}
-function renderGoals(){const box=$('goalsList');if(!box)return;const metrics=buildPremiumMetrics();const free=Math.max(0,metrics.balance);box.innerHTML=state.goals.length?state.goals.map(g=>{const target=toNumber(g.target);const saved=toNumber(g.saved);const pct=target?Math.min(100,Math.round(saved/target*100)):0;const m=monthsToGoal(g,free);const forecast=m===null?'Sem sobra mensal para prever':m===0?'Meta concluída':`Previsão: ${m} mês${m>1?'es':''}`;return`<div class="goal-item" data-goal-edit="${g.id}"><div><strong>${escapeHtml(g.name)}</strong><small>${escapeHtml(g.priority||'Média')} • ${forecast}</small><div class="progress"><i style="width:${pct}%"></i></div></div><div class="goal-value"><b>${money(saved)} / ${money(target)}</b><span>${pct}%</span></div></div>`}).join(''):'<div class="empty">Nenhuma meta criada. Adicione reserva, viagem, carro ou quitação de dívida.</div>';document.querySelectorAll('[data-goal-edit]').forEach(el=>el.onclick=()=>openGoal(el.dataset.goalEdit))}
-function renderAI(){const box=$('aiInsights');if(!box)return;const m=buildPremiumMetrics();const insights=[];if(m.commitment>50)insights.push(['bad','Seu comprometimento está alto','Priorize quitar dívidas caras e evite novas parcelas.']);else if(m.commitment>30)insights.push(['warn','Seu comprometimento merece atenção','Tente manter novas compras fora do parcelamento longo.']);else insights.push(['good','Comprometimento saudável','Você tem margem para metas e imprevistos.']);if(m.balance<0)insights.push(['bad','Seu saldo livre caiu abaixo de zero','Revise contas fixas ou renegocie pagamentos do mês.']);else if(m.balance>0)insights.push(['good','Há sobra mensal estimada',`Direcione parte da sobra (${money(m.balance)}) para uma meta.`]);state.accounts.forEach(a=>{const i=interestInfo(a);if(i&&i.level==='Abusivo')insights.push(['bad',`${a.name} tem juros abusivos`,`Taxa estimada: ${i.monthlyRate===null?'indefinida':(i.monthlyRate*100).toFixed(2)+'% a.m.'}. Considere renegociar.`])});const nextGoal=state.goals.find(g=>toNumber(g.target)>toNumber(g.saved));if(nextGoal){const months=monthsToGoal(nextGoal,Math.max(0,m.balance));if(months!==null)insights.push(['good',`Você conseguirá concluir “${nextGoal.name}” em ${months} mês${months>1?'es':''}`,'Previsão baseada na sobra mensal atual.'])}box.innerHTML=insights.slice(0,6).map(x=>`<div class="ai-item ${x[0]}"><strong>${escapeHtml(x[1])}</strong><p>${escapeHtml(x[2])}</p></div>`).join('')}
-function renderCharts(){const payments=currentMonthPayments();const cats=categoryTotals(payments);const catBox=$('categoryChart');const rank=$('categoryRanking');if(catBox){const max=Math.max(1,...Object.values(cats));catBox.innerHTML=Object.entries(cats).length?Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="bar-row"><span>${escapeHtml(k)}</span><i style="width:${Math.max(4,v/max*100)}%"></i><b>${money(v)}</b></div>`).join(''):'<div class="empty">Sem gastos no mês.</div>'}if(rank){rank.innerHTML=Object.entries(cats).length?`<h3>Ranking de categorias</h3>`+Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v],i)=>`<div class="ranking-row"><span>${i+1}. ${escapeHtml(k)}</span><b>${money(v)}</b></div>`).join(''):'<div class="empty">Ranking aparecerá após adicionar contas.</div>'}const m=buildPremiumMetrics();const inc=$('incomeDebtChart');if(inc){const max=Math.max(1,m.salary.net,m.total);inc.innerHTML=`<div class="bar-row"><span>Renda líquida</span><i style="width:${m.salary.net/max*100}%"></i><b>${money(m.salary.net)}</b></div><div class="bar-row warn"><span>Dívida do mês</span><i style="width:${m.total/max*100}%"></i><b>${money(m.total)}</b></div>`}const fut=$('futureChart');if(fut){const months=[0,1,2,3,4,5].map(i=>{const d=new Date(viewDate.getFullYear(),viewDate.getMonth()+i,1);const t=monthTotals(d).total;return{label:`${MONTHS[d.getMonth()].slice(0,3)}/${String(d.getFullYear()).slice(2)}`,total:t}});const max=Math.max(1,...months.map(x=>x.total));fut.innerHTML=months.map(x=>`<div class="bar-row"><span>${x.label}</span><i style="width:${Math.max(4,x.total/max*100)}%"></i><b>${money(x.total)}</b></div>`).join('')}}
-function buildHistorySnapshot(){try{const salary=salaryCalc();const mt=monthTotals(viewDate);const key=`${viewDate.getFullYear()}-${String(viewDate.getMonth()+1).padStart(2,'0')}`;const snapshot={key,month:MONTHS[viewDate.getMonth()],year:viewDate.getFullYear(),income:salary.net,total:mt.total,paid:mt.paid,balance:salary.net-mt.total,createdAt:new Date().toISOString()};const list=[...(state.history||[]).filter(h=>h.key!==key),snapshot].slice(-24);return list}catch{return state.history||[]}}
-function renderHistory(){const box=$('historyTimeline');if(!box)return;const history=buildHistorySnapshot().slice(-6).reverse();box.innerHTML=history.length?history.map(h=>`<div class="timeline-item"><span></span><div><strong>${escapeHtml(h.month)} ${h.year}</strong><p>Renda: ${money(h.income)} • Dívidas: ${money(h.total)} • Pago: ${money(h.paid)} • Saldo: ${money(h.balance)}</p></div></div>`).join(''):'<div class="empty">O histórico aparecerá conforme você usa o app.</div>'}
-function renderAchievements(){const box=$('achievementsList');if(!box)return;const m=buildPremiumMetrics();const achievements=[];if(m.paidRate===100&&m.total>0)achievements.push('🏆 Mês 100% pago');if(m.commitment<=30&&m.salary.net>0)achievements.push('🟢 Vida financeira saudável');if(state.goals.some(g=>toNumber(g.saved)>=toNumber(g.target)&&toNumber(g.target)>0))achievements.push('💰 Primeira meta concluída');if(m.balance>0)achievements.push('🔥 Sobra mensal positiva');if(state.accounts.filter(a=>accountStatus(a,viewDate)==='finished').length>0)achievements.push('✅ Dívidas quitadas registradas');if(!achievements.length)achievements.push('🚀 Comece adicionando contas e metas');box.innerHTML=achievements.map(a=>`<div class="achievement">${escapeHtml(a)}</div>`).join('')}
-function renderPremiumV6(){document.body.classList.toggle('values-hidden',!!state.security?.hideValues);if($('toggleValuesBtn'))$('toggleValuesBtn').textContent=state.security?.hideValues?'Mostrar valores':'Ocultar valores';renderGoals();renderAI();renderCharts()}
-function openGoal(id=null){const g=id?state.goals.find(x=>x.id===id):null;$('goalDialogTitle').textContent=g?'Editar meta':'Nova meta';$('goalId').value=g?.id||'';$('goalName').value=g?.name||'';$('goalTarget').value=g?.target||'';$('goalSaved').value=g?.saved||'';$('goalDeadline').value=g?.deadline||'';$('goalPriority').value=g?.priority||'Média';$('deleteGoalBtn').classList.toggle('hidden',!g);updateGoalPreview();$('goalDialog').showModal()}
-function updateGoalPreview(){if(!$('goalPreview'))return;const g={target:toNumber($('goalTarget').value),saved:toNumber($('goalSaved').value)};const free=Math.max(0,buildPremiumMetrics().balance);const m=monthsToGoal(g,free);$('goalPreview').innerHTML=`Faltam <b>${money(Math.max(0,g.target-g.saved))}</b>. ${m===null?'Sem sobra mensal para prever conclusão.':m===0?'Meta já concluída.':`Previsão de conclusão: <b>${m} mês${m>1?'es':''}</b>.`}`}
-function saveGoal(e){e.preventDefault();const goal={id:$('goalId').value||crypto.randomUUID(),name:$('goalName').value.trim(),target:toNumber($('goalTarget').value),saved:toNumber($('goalSaved').value),deadline:$('goalDeadline').value,priority:$('goalPriority').value};if(!goal.name||!goal.target)return;const idx=state.goals.findIndex(g=>g.id===goal.id);if(idx>=0)state.goals[idx]=goal;else state.goals.push(goal);saveState();$('goalDialog').close();render()}
-function deleteGoal(){const id=$('goalId').value;state.goals=state.goals.filter(g=>g.id!==id);saveState();$('goalDialog').close();render()}
-function saveSecurity(e){e.preventDefault();const pin=$('pinValue').value.trim();state.security={...state.security,enabled:$('enablePin').checked,pin:pin||state.security.pin,autoLock:$('autoLock').checked,hideValues:$('hideValuesSetting').checked};saveState();$('securityDialog').close();render()}
-function openSecurity(){const sec=state.security||{};$('enablePin').checked=!!sec.enabled;$('pinValue').value='';$('autoLock').checked=!!sec.autoLock;$('hideValuesSetting').checked=!!sec.hideValues;$('securityDialog').showModal()}
-function lockApp(){if(!state.security?.enabled||!state.security?.pin){openSecurity();return}sessionStorage.removeItem('financi-unlocked');$('unlockPin').value='';$('unlockStatus').textContent='';$('lockDialog').showModal()}
-function unlockApp(e){e.preventDefault();if($('unlockPin').value===state.security.pin){sessionStorage.setItem('financi-unlocked','1');$('lockDialog').close()}else{$('unlockStatus').textContent='PIN incorreto.'}}
-function maybeLockOnStart(){if(state.security?.enabled&&state.security?.autoLock&&!sessionStorage.getItem('financi-unlocked'))setTimeout(lockApp,300)}
 
 function riskLabel(rate){
   if(rate<=0)return {title:'Sem dados',text:'Informe renda e contas para calcular o nível de comprometimento.',cls:'neutral'};
@@ -209,7 +180,7 @@ function render(){
   $('riskText').textContent=risk.text;
   $('riskBar').style.width=`${Math.min(100,Math.round(commitment))}%`;
   $('riskBar').className=risk.cls;
-  renderFilters();renderCalendar(allPayments);renderBills(payments);renderInterest();renderMonthGrid();renderFamilyPanel();renderPremiumV6();
+  renderFilters();renderCalendar(allPayments);renderBills(payments);renderInterest();renderMonthGrid();renderFamilyPanel();
 }
 function renderCalendar(allPayments){
   const first=new Date(viewDate.getFullYear(),viewDate.getMonth(),1);
@@ -324,7 +295,7 @@ async function leaveGroupFlow(){
     const oldId=workspaceId;
     workspaceId=await sairDoWorkspaceAtual(currentUser,oldId);
     const remote=await carregarDadosWorkspace(workspaceId);
-    state=remote&&Array.isArray(remote.accounts)?{...defaultState(),...remote,paid:remote.paid||{},goals:remote.goals||[],history:remote.history||[],security:{...defaultState().security,...(remote.security||{})},salary:normalizeSalary(remote.salary||{})}:defaultState();
+    state=remote&&Array.isArray(remote.accounts)?{...defaultState(),...remote,paid:remote.paid||{},salary:normalizeSalary(remote.salary||{})}:defaultState();
     localStorage.setItem(STORE,JSON.stringify(state));
     isCloudReady=true;
     await refreshGroupInfo();
@@ -393,7 +364,7 @@ async function saveProfile(e){
 }
 
 function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`financi-backup-${iso(new Date())}.json`;a.click();URL.revokeObjectURL(a.href)}
-function importData(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!data||!Array.isArray(data.accounts))throw new Error('Arquivo inválido');state={...defaultState(),...data,paid:data.paid||{},goals:data.goals||[],history:data.history||[],security:{...defaultState().security,...(data.security||{})},salary:normalizeSalary(data.salary||{})};saveState();render();alert('Backup importado com sucesso.')}catch{alert('Não consegui importar este arquivo JSON.')}};r.readAsText(file)}
+function importData(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const data=JSON.parse(r.result);if(!data||!Array.isArray(data.accounts))throw new Error('Arquivo inválido');state={...defaultState(),...data,paid:data.paid||{},salary:normalizeSalary(data.salary||{})};saveState();render();alert('Backup importado com sucesso.')}catch{alert('Não consegui importar este arquivo JSON.')}};r.readAsText(file)}
 
 populateCategories();
 $('prevMonthBtn').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);pickerYear=viewDate.getFullYear();render()};
@@ -401,7 +372,7 @@ $('nextMonthBtn').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate
 $('monthPickerBtn').onclick=()=>$('monthPicker').classList.toggle('hidden');$('yearDownBtn').onclick=()=>{pickerYear--;renderMonthGrid()};$('yearUpBtn').onclick=()=>{pickerYear++;renderMonthGrid()};
 $('openAccountBtn').onclick=()=>openAccount();$('closeAccountBtn').onclick=closeAccount;$('cancelAccountBtn').onclick=closeAccount;$('accountForm').onsubmit=saveAccount;$('deleteAccountBtn').onclick=deleteAccount;
 $('openSettingsBtn').onclick=openSettings;$('closeSettingsBtn').onclick=()=>$('settingsDialog').close();$('cancelSettingsBtn').onclick=()=>$('settingsDialog').close();$('settingsForm').onsubmit=saveSettings;
-$('openProfileBtn')?.addEventListener('click',openProfile);$('openGroupBtn')?.addEventListener('click',openGroup);$('openGroupCardBtn')?.addEventListener('click',openGroup);$('closeGroupBtn')?.addEventListener('click',()=>$('groupDialog').close());$('createInviteModalBtn')?.addEventListener('click',async()=>{try{await createInviteFlow();renderFamilyPanel();}catch(err){console.error(err);setCloudStatus(err.message||'Erro ao criar convite.')}});$('copyInviteModalBtn')?.addEventListener('click',copyInviteFlow);$('leaveGroupBtn')?.addEventListener('click',leaveGroupFlow);$('leaveGroupModalBtn')?.addEventListener('click',leaveGroupFlow);$('closeProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('cancelProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('profileForm')?.addEventListener('submit',saveProfile);$('profileTheme')?.addEventListener('change',()=>{const old=currentProfile;currentProfile={...(currentProfile||{}),theme:$('profileTheme').value,compactMode:$('profileCompactMode')?.checked};applyProfileTheme();currentProfile=old;});$('profileCompactMode')?.addEventListener('change',()=>{const old=currentProfile;currentProfile={...(currentProfile||{}),theme:$('profileTheme')?.value||currentProfile?.theme||'dark',compactMode:$('profileCompactMode')?.checked};applyProfileTheme();currentProfile=old;});$('profilePhotoFile')?.addEventListener('change',async(e)=>{try{const url=await imageFileToDataUrl(e.target.files?.[0]);if(url)setProfilePreview(url,$('profileName').value,currentUser?.email)}catch(err){alert(err.message)}});$('profilePhotoUrl')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim(),$('profileName').value,currentUser?.email));$('profileName')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim()||currentProfile?.photoURL||currentUser?.photoURL,$('profileName').value,currentUser?.email));
+$('openProfileBtn')?.addEventListener('click',openProfile);$('openGroupBtn')?.addEventListener('click',openGroup);$('openGroupCardBtn')?.addEventListener('click',openGroup);$('closeGroupBtn')?.addEventListener('click',()=>$('groupDialog').close());$('createInviteModalBtn')?.addEventListener('click',async()=>{try{await createInviteFlow();renderFamilyPanel();}catch(err){console.error(err);setCloudStatus(err.message||'Erro ao criar convite.')}});$('copyInviteModalBtn')?.addEventListener('click',copyInviteFlow);$('leaveGroupBtn')?.addEventListener('click',leaveGroupFlow);$('leaveGroupModalBtn')?.addEventListener('click',leaveGroupFlow);$('closeProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('cancelProfileBtn')?.addEventListener('click',()=>$('profileDialog').close());$('profileForm')?.addEventListener('submit',saveProfile);$('profilePhotoFile')?.addEventListener('change',async(e)=>{try{const url=await imageFileToDataUrl(e.target.files?.[0]);if(url)setProfilePreview(url,$('profileName').value,currentUser?.email)}catch(err){alert(err.message)}});$('profilePhotoUrl')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim(),$('profileName').value,currentUser?.email));$('profileName')?.addEventListener('input',()=>setProfilePreview($('profilePhotoUrl').value.trim()||currentProfile?.photoURL||currentUser?.photoURL,$('profileName').value,currentUser?.email));
 $('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>importData(e.target.files[0]);
 ['accountType','purchaseDate','firstPaymentDate','installments','installmentValue','fixedValue','cashValue','hasDifferentFirst','firstInstallmentValue','category'].forEach(id=>$(id).addEventListener('input',updateSmartForm));
 ['grossSalary','salaryName1','manualBalance','useSecondSalary','useINSS','showFGTS','useTransport','useFood','foodMode','foodValue','useHealth','healthMode','healthValue','grossSalary2','salaryName2','useINSS2','showFGTS2','useTransport2','useFood2','foodMode2','foodValue2','useHealth2','healthMode2','healthValue2'].forEach(id=>$(id).addEventListener('input',updateSalaryPreview));
@@ -415,45 +386,11 @@ $('joinInviteBtn')?.addEventListener('click',async()=>{
     if(!code)throw new Error('Cole um código ou link de convite.');
     workspaceId=await entrarPorConvite(code,currentUser);
     const remote=await carregarDadosWorkspace(workspaceId);
-    if(remote&&Array.isArray(remote.accounts)){state={...defaultState(),...remote,paid:remote.paid||{},goals:remote.goals||[],history:remote.history||[],security:{...defaultState().security,...(remote.security||{})},salary:normalizeSalary(remote.salary||{})};localStorage.setItem(STORE,JSON.stringify(state));}
+    if(remote&&Array.isArray(remote.accounts)){state={...defaultState(),...remote,paid:remote.paid||{},salary:normalizeSalary(remote.salary||{})};localStorage.setItem(STORE,JSON.stringify(state));}
     isCloudReady=true;await refreshGroupInfo();render();setCloudStatus('Você entrou no controle compartilhado com sucesso.');
   }catch(err){console.error(err);setCloudStatus(err.message||'Não consegui entrar pelo convite.')}
 });
 
-
-$('openGoalBtn')?.addEventListener('click',()=>openGoal());$('goalForm')?.addEventListener('submit',saveGoal);$('closeGoalBtn')?.addEventListener('click',()=>$('goalDialog').close());$('cancelGoalBtn')?.addEventListener('click',()=>$('goalDialog').close());$('deleteGoalBtn')?.addEventListener('click',deleteGoal);['goalTarget','goalSaved'].forEach(id=>$(id)?.addEventListener('input',updateGoalPreview));
-$('openSecurityBtn')?.addEventListener('click',openSecurity);$('securityForm')?.addEventListener('submit',saveSecurity);$('closeSecurityBtn')?.addEventListener('click',()=>$('securityDialog').close());$('cancelSecurityBtn')?.addEventListener('click',()=>$('securityDialog').close());$('toggleValuesBtn')?.addEventListener('click',()=>{state.security={...(state.security||{}),hideValues:!state.security?.hideValues};saveState();render()});$('lockAppBtn')?.addEventListener('click',lockApp);$('unlockForm')?.addEventListener('submit',unlockApp);
-
 if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 showLoggedOut();
 initAuth();
-
-
-// V6.2: menu superior limpo e comportamento mobile
-(function setupCleanMobileMenu(){
-  const ready = () => {
-    const btn = document.getElementById('moreMenuBtn');
-    const menu = document.getElementById('overflowMenu');
-    if(!btn || !menu) return;
-    btn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      const willOpen = menu.classList.contains('hidden');
-      menu.classList.toggle('hidden', !willOpen);
-      btn.setAttribute('aria-expanded', String(willOpen));
-    });
-    menu.addEventListener('click', (event) => {
-      if(event.target.closest('button')){
-        menu.classList.add('hidden');
-        btn.setAttribute('aria-expanded','false');
-      }
-    });
-    document.addEventListener('click', (event) => {
-      if(!event.target.closest('.menu-wrap')){
-        menu.classList.add('hidden');
-        btn.setAttribute('aria-expanded','false');
-      }
-    });
-  };
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready);
-  else ready();
-})();
