@@ -74,27 +74,49 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
 
 .family-mini-members,.group-members-list{display:grid;gap:10px}.family-linked-area{display:grid;grid-template-columns:1fr 1fr;gap:10px}.group-modal-card{max-width:680px}.group-details{display:grid;gap:16px}.group-summary{background:rgba(59,130,246,.1);border:1px solid rgba(96,165,250,.22);border-radius:22px;padding:16px}.group-summary h3{font-size:22px;color:#fff;margin:4px 0 6px}.group-summary p{color:#cbd5e1;line-height:1.55}.group-member-row strong em{font-style:normal;margin-left:6px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#93c5fd;background:rgba(59,130,246,.16);border:1px solid rgba(96,165,250,.25);border-radius:999px;padding:3px 6px}.group-actions{grid-template-columns:1fr 1fr 1fr}.hidden{display:none!important}@media(max-width:640px){.family-linked-area,.group-actions{grid-template-columns:1fr}}
 
-/* Mobile first cleanup v5.3 */
-.top-actions-menu{position:relative}.top-actions-menu>summary{list-style:none}.top-actions-menu>summary::-webkit-details-marker{display:none}.menu-trigger{display:none;align-items:center;justify-content:center;gap:10px;border:1px solid var(--border);background:rgba(255,255,255,.07);color:#fff;border-radius:16px;padding:12px 15px;font-weight:900}.menu-trigger b{font-size:20px;line-height:1}.side-panel-inner{display:grid;gap:18px}.mobile-side-summary{display:none}.mobile-side-details>summary{list-style:none}.mobile-side-details>summary::-webkit-details-marker{display:none}
+/* V5.4 - Experiência mobile separada sem alterar o desktop */
+.mobile-appbar,.mobile-quick-actions,.mobile-bottom-nav{display:none}
 
 @media (max-width: 760px){
-  html,body{overflow-x:hidden;background:#070a12}
-  body{background:linear-gradient(180deg,#070a12 0%,#0b1020 100%)}
-  .app-shell{width:100%;padding:12px 10px 32px}
-  .topbar{position:sticky;top:0;z-index:30;display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;margin:0 -10px 12px;padding:10px;background:rgba(7,10,18,.92);border-bottom:1px solid rgba(148,163,184,.12);backdrop-filter:blur(14px)}
-  .topbar h1{font-size:22px;letter-spacing:-.04em}.topbar .eyebrow{font-size:8px;margin-bottom:4px}
-  .menu-trigger{display:flex;min-width:92px}.top-actions-menu[open] .menu-trigger{background:rgba(59,130,246,.18);border-color:rgba(96,165,250,.36)}
-  .top-actions{position:absolute;right:0;top:calc(100% + 8px);width:min(88vw,330px);display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px;padding:10px;background:rgba(15,23,42,.98);border:1px solid var(--border);border-radius:22px;box-shadow:0 22px 55px rgba(0,0,0,.45)}
-  .top-actions .user-chip{grid-column:1/-1;justify-content:center;max-width:none;min-height:44px}.top-actions .ghost-btn{width:100%;padding:12px 10px;border-radius:14px;font-size:12px}
-  .layout{display:block}.main-panel{gap:12px}.card{border-radius:20px;box-shadow:0 14px 35px rgba(0,0,0,.22);backdrop-filter:none}.section-card,.metric,.health-card{padding:14px}
-  .month-card{grid-template-columns:44px 1fr 44px;padding:8px;border-radius:22px}.nav-arrow,.icon-btn{height:42px;border-radius:14px}.month-display span{font-size:21px}.month-display small{font-size:11px}
-  .summary-grid-five{grid-template-columns:1fr 1fr!important;gap:9px}.summary-grid-five .metric:nth-child(n+4){display:none}.metric strong{font-size:18px}.metric span{font-size:10px}.metric{min-height:84px;display:flex;flex-direction:column;justify-content:center}
-  .section-title{align-items:stretch;display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}.section-title .primary-btn{width:100%}
-  .filters{overflow:auto;flex-wrap:nowrap;margin:0 -14px 14px;padding:0 14px 4px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.filter-btn{white-space:nowrap;padding:8px 11px;font-size:12px}
-  .calendar-card{padding:12px}.calendar-grid{gap:4px}.calendar-weekday{font-size:10px;padding:3px 0}.calendar-day{min-height:48px;padding:5px;border-radius:10px}.calendar-day b{font-size:9px;line-height:1.1}.calendar-day span{font-size:12px}
-  .bill-list{gap:9px}.bill-row{padding:12px;border-radius:18px;gap:10px}.bill-row h3{font-size:14px}.bill-meta{gap:5px;margin-top:8px}.pill{font-size:10px;padding:5px 7px}.bill-value{font-size:17px;text-align:left}.paid-toggle{min-height:42px}
-  .side-panel{margin-top:12px}.mobile-side-details{display:block}.mobile-side-details:not([open]) .side-panel-inner{display:none}.mobile-side-summary{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:13px 14px;border:1px solid var(--border);border-radius:18px;background:rgba(255,255,255,.06);color:#fff;font-weight:900}.mobile-side-details[open] .mobile-side-summary b{transform:rotate(180deg)}.side-panel-inner{gap:12px}.health-card h2,.risk-card h2{font-size:21px}.mini-dashboard{gap:9px}.side-stat{font-size:13px}
-  .share-actions,.family-linked-area,.group-actions{grid-template-columns:1fr!important}.auth-card{padding:22px;border-radius:24px}.modal{padding:8px;max-width:100vw}.modal-card{max-height:92vh;overflow:auto;border-radius:22px;padding:16px}.form-grid,.summary-grid{grid-template-columns:1fr!important}.benefit-row{grid-template-columns:1fr}.salary-preview .line{align-items:flex-start;flex-direction:column;gap:2px}.modal-actions{grid-template-columns:1fr!important}.primary-btn,.ghost-btn,.danger-btn{min-height:44px}
-}
+  :root{--mobile-bg:#07111f;--mobile-card:#101827;--mobile-card-2:#0b1220}
+  html{scroll-behavior:smooth;scroll-padding-top:78px;background:var(--mobile-bg)}
+  body{overflow-x:hidden;background:linear-gradient(180deg,#07111f 0%,#0b1020 42%,#070a12 100%)}
+  body:has(.auth-screen:not(.hidden)){background:#070a12}
+  .app-shell{width:100%;padding:76px 12px 92px;margin:0;max-width:none}
 
-@media (min-width: 761px){.top-actions-menu{display:block}.top-actions-menu[open] .top-actions,.top-actions-menu .top-actions{position:static}.top-actions-menu>.top-actions{display:flex}.mobile-side-details{display:block}.mobile-side-details>summary{display:none}.side-panel-inner{display:grid}}
+  /* No celular o app usa outro cabeçalho. No PC o cabeçalho antigo permanece intacto. */
+  .topbar{display:none!important}
+  .mobile-appbar{position:fixed;left:0;right:0;top:0;z-index:80;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:10px;padding:10px 12px calc(10px + env(safe-area-inset-top,0px));background:rgba(7,17,31,.96);border-bottom:1px solid rgba(148,163,184,.12);backdrop-filter:blur(18px)}
+  .mobile-avatar,.mobile-more>summary{width:44px;height:44px;border:1px solid rgba(148,163,184,.2);border-radius:16px;background:rgba(255,255,255,.07);color:#fff;display:grid;place-items:center;font-weight:900;list-style:none}
+  .mobile-more>summary::-webkit-details-marker{display:none}
+  .mobile-title{min-width:0;text-align:center}.mobile-title span{display:block;color:#8b98ad;text-transform:uppercase;font-size:10px;font-weight:900;letter-spacing:.14em}.mobile-title strong{display:block;color:#fff;font-size:18px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:capitalize}
+  .mobile-more{position:relative}.mobile-more-panel{position:absolute;right:0;top:52px;display:grid;grid-template-columns:1fr;gap:8px;width:min(72vw,260px);padding:10px;border:1px solid rgba(148,163,184,.2);border-radius:22px;background:#101827;box-shadow:0 22px 55px rgba(0,0,0,.48)}
+  .mobile-more-panel button{border:1px solid rgba(148,163,184,.18);border-radius:15px;background:rgba(255,255,255,.06);color:#fff;padding:13px;font-weight:900;text-align:left}
+
+  .layout{display:block}.main-panel{display:grid;gap:12px}.side-panel{display:grid;gap:12px;margin-top:12px}
+  .card{border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,.24);backdrop-filter:none;background:rgba(16,24,39,.94)}
+  .section-card,.metric,.health-card{padding:14px}.eyebrow{font-size:9px;margin-bottom:5px}h2{font-size:17px}
+
+  /* Resumo vira painel de app, não grade de desktop. */
+  .summary-grid-five{grid-template-columns:1fr 1fr!important;gap:10px}.summary-grid-five .metric{min-height:82px}.summary-grid-five .metric span{font-size:10px}.summary-grid-five .metric strong{font-size:18px;margin-top:6px}.summary-grid-five .metric:nth-child(4),.summary-grid-five .metric:nth-child(5){display:none}
+
+  .month-card{grid-template-columns:44px 1fr 44px;padding:8px;border-radius:24px}.nav-arrow{height:42px;border-radius:15px;font-size:28px}.month-display span{font-size:20px}.month-display small{display:none}.month-picker{padding:14px}.month-grid{grid-template-columns:repeat(3,1fr)}
+
+  .mobile-quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:10px;background:transparent;border:0;box-shadow:none}
+  .mobile-quick-actions button{min-height:68px;border:1px solid rgba(148,163,184,.16);border-radius:20px;background:linear-gradient(180deg,rgba(59,130,246,.17),rgba(15,23,42,.92));color:#fff;display:grid;place-items:center;font-weight:900}.mobile-quick-actions b{font-size:20px}.mobile-quick-actions span{font-size:12px;color:#dbeafe}
+
+  /* Calendário reduzido: mostra só o essencial. */
+  .calendar-card{padding:12px}.calendar-grid{gap:4px}.calendar-weekday{font-size:10px;padding:3px 0}.calendar-day{min-height:44px;border-radius:12px;padding:6px}.calendar-day span{font-size:12px}.calendar-day b{display:none}.calendar-day small{display:none}.calendar-day.has-bills::after{content:"";width:7px;height:7px;border-radius:99px;background:#60a5fa;margin-top:auto}
+
+  /* A lista de contas fica mais parecida com app nativo. */
+  .section-title{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}.section-title .primary-btn{width:100%;min-height:46px}.filters{display:flex;flex-wrap:nowrap;gap:8px;overflow:auto;margin:0 -14px 14px;padding:0 14px 5px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.filter-btn{white-space:nowrap;font-size:12px;padding:8px 11px}
+  .bill-groups{gap:14px}.bill-list{gap:10px;margin-top:8px}.group-title{font-size:11px}.bill-row{grid-template-columns:1fr!important;border-radius:20px;padding:13px;background:linear-gradient(180deg,rgba(30,64,175,.26),rgba(15,23,42,.97));gap:10px}.bill-main{grid-template-columns:1fr!important;gap:8px}.bill-row h3{font-size:15px}.bill-meta{gap:5px;margin-top:8px}.pill{font-size:10px;padding:5px 7px}.bill-value{text-align:left;font-size:18px}.paid-toggle{width:100%;min-height:42px}
+
+  /* Conteúdos avançados vão para "Mais" e ficam recolhíveis visualmente. */
+  .health-card h2,.risk-card h2{font-size:22px}.health-card p,.risk-card p{font-size:13px}.mini-dashboard{gap:9px}.side-stat{font-size:13px}.share-actions,.family-linked-area,.group-actions{grid-template-columns:1fr!important}.interest-item p{font-size:12px}
+
+  .mobile-bottom-nav{position:fixed;left:10px;right:10px;bottom:10px;z-index:70;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px;border:1px solid rgba(148,163,184,.18);border-radius:24px;background:rgba(15,23,42,.94);box-shadow:0 18px 45px rgba(0,0,0,.42);backdrop-filter:blur(18px)}
+  .mobile-bottom-nav a{color:#cbd5e1;text-decoration:none;text-align:center;border-radius:16px;padding:10px 4px;font-size:12px;font-weight:900}.mobile-bottom-nav a:active,.mobile-bottom-nav a:focus{background:rgba(59,130,246,.2);color:#fff}
+
+  .modal{padding:8px;max-width:100vw}.modal-card{max-height:92vh;overflow:auto;border-radius:24px;padding:16px}.form-grid,.summary-grid{grid-template-columns:1fr!important}.benefit-row{grid-template-columns:1fr}.modal-actions{grid-template-columns:1fr!important}.modal-actions span{display:none}.primary-btn,.ghost-btn,.danger-btn{min-height:44px}.auth-card{padding:24px;border-radius:26px}
+}

@@ -28,19 +28,32 @@
         <span class="eyebrow">Controle financeiro pessoal</span>
         <h1>Financi App</h1>
       </div>
-      <details class="top-actions-menu" open>
-        <summary class="menu-trigger" aria-label="Abrir menu de ações">
-          <span>Menu</span>
-          <b>☰</b>
-        </summary>
-        <div class="top-actions">
-          <div class="user-chip" id="userChip">Offline</div>
-          <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
-          <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
-          <button class="ghost-btn" id="openGroupBtn" type="button">Grupo</button>
-          <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
-          <button class="ghost-btn" id="importBtn" type="button">Importar</button>
-          <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
+      <div class="top-actions">
+        <div class="user-chip" id="userChip">Offline</div>
+        <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
+        <button class="ghost-btn" id="importBtn" type="button">Importar</button>
+        <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
+        <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
+        <button class="ghost-btn" id="openGroupBtn" type="button">Grupo</button>
+        <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
+      </div>
+    </header>
+
+    <header class="mobile-appbar" aria-label="Navegação mobile">
+      <button class="mobile-avatar" type="button" data-mobile-click="openProfileBtn" aria-label="Abrir perfil">☻</button>
+      <div class="mobile-title">
+        <span>Financi App</span>
+        <strong id="mobileMonthLabel">Mês atual</strong>
+      </div>
+      <details class="mobile-more">
+        <summary aria-label="Abrir opções">☰</summary>
+        <div class="mobile-more-panel">
+          <button type="button" data-mobile-click="openSettingsBtn">Renda e saldo</button>
+          <button type="button" data-mobile-click="openProfileBtn">Perfil</button>
+          <button type="button" data-mobile-click="openGroupBtn">Grupo</button>
+          <button type="button" data-mobile-click="exportBtn">Exportar</button>
+          <button type="button" data-mobile-click="importBtn">Importar</button>
+          <button type="button" data-mobile-click="logoutBtn">Sair</button>
         </div>
       </details>
     </header>
@@ -65,7 +78,7 @@
           <div class="month-grid" id="monthGrid"></div>
         </div>
 
-        <section class="summary-grid summary-grid-five">
+        <section class="summary-grid summary-grid-five" id="mobileResumo">
           <article class="metric card"><span>Receita líquida</span><strong id="netIncomeMetric">R$ 0,00</strong></article>
           <article class="metric card"><span>Total do mês</span><strong id="monthTotal">R$ 0,00</strong></article>
           <article class="metric card"><span>Saldo disponível</span><strong id="monthBalance">R$ 0,00</strong></article>
@@ -73,14 +86,20 @@
           <article class="metric card"><span>Risco financeiro</span><strong id="riskMetric">0%</strong></article>
         </section>
 
-        <section class="card section-card calendar-card">
+        <section class="mobile-quick-actions card" aria-label="Ações rápidas">
+          <button type="button" data-mobile-click="openAccountBtn"><b>+</b><span>Conta</span></button>
+          <button type="button" data-mobile-click="openSettingsBtn"><b>R$</b><span>Renda</span></button>
+          <button type="button" data-mobile-scroll="mobileContas"><b>≡</b><span>Contas</span></button>
+        </section>
+
+        <section class="card section-card calendar-card" id="mobileCalendario">
           <div class="section-title compact">
             <div><span class="eyebrow">Calendário financeiro</span><h2>Vencimentos do mês</h2></div>
           </div>
           <div class="calendar-grid" id="calendarGrid"></div>
         </section>
 
-        <section class="card section-card">
+        <section class="card section-card" id="mobileContas">
           <div class="section-title">
             <div>
               <span class="eyebrow">Lançamentos do mês</span>
@@ -93,13 +112,7 @@
         </section>
       </section>
 
-      <aside class="side-panel">
-        <details class="mobile-side-details" open>
-          <summary class="mobile-side-summary">
-            <span>Resumo e opções extras</span>
-            <b>⌄</b>
-          </summary>
-          <div class="side-panel-inner">
+      <aside class="side-panel" id="mobileMais">
         <section class="card health-card">
           <span class="eyebrow">Visão rápida</span>
           <h2 id="healthTitle">Tudo certo</h2>
@@ -153,10 +166,15 @@
           </div>
           <div id="interestList" class="interest-list"></div>
         </section>
-          </div>
-        </details>
       </aside>
     </main>
+
+    <nav class="mobile-bottom-nav" aria-label="Menu inferior mobile">
+      <a href="#mobileResumo">Resumo</a>
+      <a href="#mobileContas">Contas</a>
+      <a href="#mobileCalendario">Agenda</a>
+      <a href="#mobileMais">Mais</a>
+    </nav>
   </div>
 
   <dialog id="groupDialog" class="modal">

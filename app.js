@@ -395,19 +395,22 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.ser
 showLoggedOut();
 initAuth();
 
-// V5.3 - comportamento responsivo dos menus no celular
-function syncResponsiveMenus(){
-  const isMobile = window.matchMedia('(max-width: 760px)').matches;
-  const actionsMenu = document.querySelector('.top-actions-menu');
-  const sideDetails = document.querySelector('.mobile-side-details');
-  if(actionsMenu) actionsMenu.open = !isMobile;
-  if(sideDetails) sideDetails.open = !isMobile;
-}
-window.addEventListener('DOMContentLoaded', () => {
-  syncResponsiveMenus();
-  window.addEventListener('resize', syncResponsiveMenus);
-  document.querySelectorAll('.top-actions button').forEach(btn => btn.addEventListener('click', () => {
-    const actionsMenu = document.querySelector('.top-actions-menu');
-    if(window.matchMedia('(max-width: 760px)').matches && actionsMenu) actionsMenu.open = false;
+/* V5.4 - controles mobile independentes; não altera o layout desktop */
+function setupMobileShell(){
+  const syncMonth=()=>{const src=document.getElementById('currentMonthLabel');const dst=document.getElementById('mobileMonthLabel');if(src&&dst)dst.textContent=src.textContent||'Mês atual'};
+  syncMonth();
+  const monthLabel=document.getElementById('currentMonthLabel');
+  if(monthLabel){new MutationObserver(syncMonth).observe(monthLabel,{childList:true,characterData:true,subtree:true});}
+  document.querySelectorAll('[data-mobile-click]').forEach(btn=>btn.addEventListener('click',()=>{
+    const target=document.getElementById(btn.dataset.mobileClick);
+    target?.click();
+    document.querySelectorAll('.mobile-more[open]').forEach(d=>d.removeAttribute('open'));
   }));
-});
+  document.querySelectorAll('[data-mobile-scroll]').forEach(btn=>btn.addEventListener('click',()=>{
+    document.getElementById(btn.dataset.mobileScroll)?.scrollIntoView({behavior:'smooth',block:'start'});
+  }));
+  document.querySelectorAll('.mobile-bottom-nav a').forEach(link=>link.addEventListener('click',()=>{
+    document.querySelectorAll('.mobile-more[open]').forEach(d=>d.removeAttribute('open'));
+  }));
+}
+setupMobileShell();
