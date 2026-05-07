@@ -8,10 +8,25 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Financi App" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=71" />
+  <style>
+    #appShell.hidden, #authScreen.hidden { display: none !important; }
+    body:has(#authScreen:not(.hidden)) #appShell,
+    body:has(#authScreen:not(.hidden)) header.topbar,
+    body:has(#authScreen:not(.hidden)) .ffh-actions,
+    body:has(#authScreen:not(.hidden)) .ffh-menu,
+    body:has(#authScreen:not(.hidden)) #financiFixedHeader { display:none !important; }
+  </style>
+  <script>
+    (function(){
+      if ('caches' in window) caches.keys().then(function(keys){ keys.forEach(function(k){ if(/^financi-app-/.test(k)) caches.delete(k); }); });
+      if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(function(rs){ rs.forEach(function(r){ r.unregister(); }); });
+    })();
+  </script>
+
   <title>Financi App V6.2 Mobile Clean</title>
 </head>
-<body>
+<body class="financi-login-mode">
   <section class="auth-screen" id="authScreen">
     <div class="auth-card card">
       <span class="eyebrow">Financi App seguro</span>
@@ -388,7 +403,7 @@
     </form>
   </dialog>
   <input type="file" id="importFile" accept="application/json" hidden />
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=71"></script>
 
 
 

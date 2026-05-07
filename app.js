@@ -55,6 +55,7 @@ function saveState(){
 }
 function setCloudStatus(text){const el=$('shareStatus');if(el)el.textContent=text}
 function showLoggedOut(){
+  document.body.classList.add('financi-login-mode');
   $('authScreen')?.classList.remove('hidden');
   $('appShell')?.classList.add('hidden');
 }
@@ -77,6 +78,7 @@ function renderUserChip(){
   chip.innerHTML=`${photo?`<img src="${escapeHtml(photo)}" alt="">`:`<span class="chip-avatar">${escapeHtml(avatarFallback(name,email))}</span>`}<span>${escapeHtml(name)}</span>`;
 }
 function showLoggedIn(user){
+  document.body.classList.remove('financi-login-mode');
   $('authScreen')?.classList.add('hidden');
   $('appShell')?.classList.remove('hidden');
   renderUserChip();
