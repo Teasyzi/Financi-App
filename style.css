@@ -250,3 +250,13 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
 @media (max-width:380px){
   .m-calendar-grid{gap:4px}.m-calendar-day{min-height:48px;border-radius:12px;padding:5px 3px}.m-calendar-day b{font-size:8px}.m-calendar-day small{display:none}.m-month-switch{grid-template-columns:44px minmax(0,1fr) 44px}.m-month-switch button{width:44px;height:44px}
 }
+
+
+/* V5.8 - instalação PWA */
+.install-pwa-btn{border:1px solid rgba(96,165,250,.35);border-radius:14px;background:rgba(37,99,235,.18);color:#dbeafe;font-weight:900;padding:10px 12px;text-align:left}
+.install-pwa-btn[hidden],.m-install-pwa-btn[hidden]{display:none!important}
+@media (max-width:760px){
+  .m-actions-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .m-install-pwa-btn{border-radius:20px;color:var(--m-text);padding:13px 6px;min-height:70px;display:grid;place-items:center;border:1px solid rgba(96,165,250,.35);background:rgba(37,99,235,.18)}
+  .m-install-pwa-btn b{font-size:19px;line-height:1}.m-install-pwa-btn span{font-size:11px;font-weight:900;color:#dbeafe}
+}

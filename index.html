@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#070a12" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Financi App" />
   <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="style.css" />
   <title>Financi App</title>
 </head>
@@ -53,6 +55,7 @@
           <button type="button" data-mobile-click="openGroupBtn">Grupo</button>
           <button type="button" data-mobile-click="exportBtn">Exportar</button>
           <button type="button" data-mobile-click="importBtn">Importar</button>
+          <button type="button" id="installPwaBtn" class="install-pwa-btn" hidden>Instalar app</button>
           <button type="button" data-mobile-click="logoutBtn">Sair</button>
         </div>
       </details>
@@ -204,6 +207,7 @@
         <button type="button" data-mobile-click="openProfileBtn"><b>☻</b><span>Perfil</span></button>
         <button type="button" data-mobile-click="openGroupBtn"><b>👥</b><span>Grupo</span></button>
         <button type="button" data-mobile-click="exportBtn"><b>⇩</b><span>Exportar</span></button>
+        <button type="button" id="mInstallPwaBtn" class="m-install-pwa-btn" hidden><b>⬇</b><span>Instalar</span></button>
       </section>
 
       <section class="m-section" id="mContas">

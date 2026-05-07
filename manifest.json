@@ -1,11 +1,48 @@
 {
   "name": "Financi App",
   "short_name": "Financi",
-  "description": "Controle financeiro pessoal com parcelas, juros e renda líquida.",
-  "start_url": "./index.html",
+  "description": "Controle financeiro pessoal com agenda de contas, parcelas, renda e grupo financeiro.",
+  "id": "./",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
   "background_color": "#070a12",
   "theme_color": "#070a12",
   "orientation": "portrait-primary",
-  "icons": []
+  "categories": [
+    "finance",
+    "productivity"
+  ],
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }

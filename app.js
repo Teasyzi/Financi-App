@@ -469,6 +469,47 @@ $('joinInviteBtn')?.addEventListener('click',async()=>{
   }catch(err){console.error(err);setCloudStatus(err.message||'Não consegui entrar pelo convite.')}
 });
 
+
+
+/* V5.8 - instalação como PWA no celular */
+let deferredInstallPrompt = null;
+function isRunningStandalone(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function setInstallButtonsVisible(visible){
+  ['installPwaBtn','mInstallPwaBtn'].forEach(id=>{
+    const btn=document.getElementById(id);
+    if(btn) btn.hidden = !visible;
+  });
+}
+async function handleInstallPwa(){
+  if(isRunningStandalone()){
+    alert('O Financi App já está instalado neste aparelho.');
+    return;
+  }
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice.catch(()=>null);
+    deferredInstallPrompt = null;
+    setInstallButtonsVisible(false);
+    return;
+  }
+  alert('Para instalar: abra o menu do navegador e toque em “Adicionar à tela inicial” ou “Instalar app”. No iPhone, use Compartilhar > Adicionar à Tela de Início.');
+}
+window.addEventListener('beforeinstallprompt',(event)=>{
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  if(!isRunningStandalone()) setInstallButtonsVisible(true);
+});
+window.addEventListener('appinstalled',()=>{
+  deferredInstallPrompt = null;
+  setInstallButtonsVisible(false);
+});
+window.addEventListener('load',()=>{
+  ['installPwaBtn','mInstallPwaBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',handleInstallPwa));
+  if(isRunningStandalone()) setInstallButtonsVisible(false);
+});
+
 if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 showLoggedOut();
 initAuth();
