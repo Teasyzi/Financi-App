@@ -1428,318 +1428,310 @@ header p:first-child,
 
 
 /* =========================================================
-   FINANCI APP V6.8 — CABEÇALHO DEFINITIVO
-   Corrige o topo criando um header controlado e escondendo
-   os blocos antigos que estavam quebrando em celulares.
+   FINANCI APP V6.9 — CABEÇALHO ÚNICO RESPONSIVO
+   Fica apenas: Perfil + Renda + Ocultar + Menu.
+   Remove duplicidade e não aparece na tela de login.
 ========================================================= */
 
 :root {
-  --ffh-bg: #031f18;
-  --ffh-bg-2: #020617;
-  --ffh-card: #071523;
-  --ffh-soft: rgba(255,255,255,.075);
-  --ffh-border: rgba(255,255,255,.11);
-  --ffh-text: #f8fafc;
-  --ffh-muted: #9ca8bd;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box !important;
+  --header-gap: 8px;
+  --header-bg: rgba(255,255,255,.075);
+  --header-border: rgba(255,255,255,.12);
+  --header-text: #f8fafc;
 }
 
 html,
 body {
   width: 100% !important;
   max-width: 100% !important;
-  margin: 0 !important;
   overflow-x: hidden !important;
-  background: linear-gradient(145deg, #06472c 0%, #042d21 44%, #020617 100%) !important;
+  background: linear-gradient(145deg, #06472c 0%, #042d21 48%, #020617 100%) !important;
   background-attachment: scroll !important;
 }
 
-/* Performance */
-.card,
-.panel,
-.widget,
-.account-card,
-.bill-card,
-.stat-card,
-.goal-card,
-.history-card,
-.insight-card,
-.month-card,
-.month-selector,
-.month-navigation,
-.month-nav,
-.menu-dropdown,
-.dropdown-menu,
-.mobile-menu,
-.side-menu,
-.drawer {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  will-change: auto !important;
-}
-
-/* Novo header controlado */
+/* Remove qualquer header artificial antigo */
+#financiFixedHeader,
 .financi-fixed-header {
-  width: min(1180px, calc(100% - 28px));
-  margin: 18px auto 18px;
-  padding: 14px;
-  border: 1px solid var(--ffh-border);
-  border-radius: 24px;
-  background: rgba(3, 31, 24, .72);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 14px;
-  position: relative;
-  z-index: 2000;
-}
-
-.ffh-brand {
-  min-width: 0;
-}
-
-.ffh-kicker {
-  display: block;
-  color: var(--ffh-muted);
-  font-size: .68rem;
-  font-weight: 800;
-  letter-spacing: 3.4px;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.ffh-brand strong {
-  display: block;
-  color: var(--ffh-text);
-  font-size: clamp(1.55rem, 3.8vw, 2.6rem);
-  line-height: 1;
-  letter-spacing: -1.6px;
-  white-space: nowrap;
-}
-
-.ffh-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 9px;
-  min-width: 0;
-}
-
-.ffh-profile,
-.ffh-btn,
-.ffh-menu-btn {
-  height: 44px;
-  border: 1px solid var(--ffh-border);
-  border-radius: 999px;
-  background: var(--ffh-soft);
-  color: var(--ffh-text);
-  font-weight: 850;
-  padding: 0 14px;
-  cursor: pointer;
-  box-shadow: none;
-}
-
-.ffh-profile {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 170px;
-  min-width: 0;
-}
-
-.ffh-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #7c3aed;
-  color: #fff;
-  display: grid;
-  place-items: center;
-  flex: 0 0 30px;
-  overflow: hidden;
-}
-
-.ffh-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.ffh-name {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.ffh-menu-btn {
-  width: 46px;
-  padding: 0;
-  font-size: 1.35rem;
-  border-radius: 16px;
-}
-
-.ffh-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 14px;
-  width: min(320px, calc(100vw - 28px));
-  max-height: calc(100vh - 110px);
-  overflow-y: auto;
-  padding: 12px;
-  border-radius: 20px;
-  border: 1px solid var(--ffh-border);
-  background: #081523;
-  box-shadow: 0 18px 48px rgba(0,0,0,.42);
-  display: none;
-  z-index: 99999;
-}
-
-.ffh-menu.open {
-  display: block;
-}
-
-.ffh-menu button,
-.ffh-menu a {
-  width: 100%;
-  min-height: 44px;
-  border-radius: 14px;
-  margin: 0 0 8px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  white-space: normal;
-  text-align: left;
-  color: #fff;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.09);
-  font-weight: 750;
-}
-
-/* Esconde headers/topbars antigos que estavam quebrando o topo.
-   O novo header assume a navegação visual. */
-body > header,
-body > .app-header,
-body > .hero,
-body > .hero-section,
-body > .top-header,
-body > .brand-area,
-body > .logo-area {
   display: none !important;
 }
 
-/* Também neutraliza headings gigantes antigos caso estejam dentro de wrappers */
+/* Esconde marca/título gigante no topo do app.
+   O app fica mais limpo e não duplica cabeçalho. */
 .logo-title,
 .brand-title,
 .app-title,
 .hero-title,
-header h1,
 .app-header h1,
 .hero h1,
-.hero-section h1 {
-  font-size: inherit;
+.hero-section h1,
+header h1,
+.app-subtitle,
+.brand-subtitle,
+.hero-subtitle,
+.subtitle,
+.app-header p:first-child,
+.hero p:first-child,
+.hero-section p:first-child,
+header p:first-child {
+  display: none !important;
 }
 
-/* Menu original não aparece; o novo menu copia os itens dele */
+/* Cabeçalhos antigos viram apenas containers transparentes das ações */
+header,
+.app-header,
+.hero,
+.hero-section,
+.top-header,
+.brand-area,
+.logo-area {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+}
+
+/* A barra de ações é o único cabeçalho visível */
+.topbar,
+.toolbar,
+.header-actions,
+.top-actions,
+.quick-actions {
+  width: min(1120px, calc(100% - 28px)) !important;
+  margin: 14px auto 18px !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto auto !important;
+  align-items: center !important;
+  gap: var(--header-gap) !important;
+  overflow: visible !important;
+  position: relative !important;
+  z-index: 1000 !important;
+}
+
+/* Se houver mais de uma barra de ações, só a primeira fica visível */
+.topbar ~ .topbar,
+.toolbar ~ .toolbar,
+.header-actions ~ .header-actions,
+.top-actions ~ .top-actions,
+.quick-actions ~ .quick-actions {
+  display: none !important;
+}
+
+/* Botão de perfil */
+.profile-chip,
+.user-chip,
+.profile-button,
+.user-profile {
+  justify-self: start !important;
+  max-width: 210px !important;
+  min-width: 0 !important;
+  height: 46px !important;
+  padding: 7px 12px !important;
+  border-radius: 999px !important;
+  background: var(--header-bg) !important;
+  border: 1px solid var(--header-border) !important;
+  color: var(--header-text) !important;
+  overflow: hidden !important;
+  box-shadow: none !important;
+}
+
+.profile-chip img,
+.user-chip img,
+.profile-button img,
+.user-profile img {
+  width: 32px !important;
+  height: 32px !important;
+  flex: 0 0 32px !important;
+  border-radius: 50% !important;
+}
+
+.profile-chip span,
+.user-chip span,
+.profile-button span,
+.user-profile span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Botões Renda, Ocultar e Menu */
+.topbar button,
+.toolbar button,
+.header-actions button,
+.top-actions button,
+.quick-actions button {
+  height: 46px !important;
+  min-width: 46px !important;
+  max-width: 160px !important;
+  padding: 0 14px !important;
+  border-radius: 16px !important;
+  background: var(--header-bg) !important;
+  border: 1px solid var(--header-border) !important;
+  color: var(--header-text) !important;
+  font-weight: 850 !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+}
+
+/* Menu hambúrguer */
+.mobile-menu-button,
+.menu-toggle,
+.hamburger,
+#menuToggle,
+button[aria-label="Menu"] {
+  width: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+  padding: 0 !important;
+  font-size: 1.32rem !important;
+}
+
+/* Menu abre como overlay correto */
 .menu-dropdown,
 .dropdown-menu,
 .mobile-menu,
 .side-menu,
 .drawer {
   position: fixed !important;
-  left: -9999px !important;
-  top: -9999px !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+  top: 78px !important;
+  right: 14px !important;
+  left: auto !important;
+  width: min(320px, calc(100vw - 28px)) !important;
+  max-width: min(320px, calc(100vw - 28px)) !important;
+  min-width: 0 !important;
+  max-height: calc(100vh - 100px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  z-index: 99999 !important;
+  transform: none !important;
+  translate: none !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  border-radius: 20px !important;
+  background: #081523 !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow: 0 18px 48px rgba(0,0,0,.42) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-/* Dashboard mobile recolhido */
+.menu-dropdown:not(.open):not(.active):not([data-open="true"]),
+.dropdown-menu:not(.open):not(.active):not([data-open="true"]),
+.mobile-menu:not(.open):not(.active):not([data-open="true"]),
+.side-menu:not(.open):not(.active):not([data-open="true"]),
+.drawer:not(.open):not(.active):not([data-open="true"]) {
+  display: none !important;
+}
+
+.menu-dropdown button,
+.dropdown-menu button,
+.mobile-menu button,
+.side-menu button,
+.drawer button,
+.menu-dropdown a,
+.dropdown-menu a,
+.mobile-menu a,
+.side-menu a,
+.drawer a {
+  width: 100% !important;
+  min-height: 44px !important;
+  margin: 0 0 8px 0 !important;
+  padding: 10px 12px !important;
+  border-radius: 14px !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+  white-space: normal !important;
+}
+
+/* Login: não mostrar cabeçalho do app */
+body.financi-login-mode .topbar,
+body.financi-login-mode .toolbar,
+body.financi-login-mode .header-actions,
+body.financi-login-mode .top-actions,
+body.financi-login-mode .quick-actions,
+body.financi-login-mode header,
+body.financi-login-mode .app-header,
+body.financi-login-mode .hero,
+body.financi-login-mode .hero-section {
+  display: none !important;
+}
+
+/* Dashboard recolhido no celular */
 .mobile-dashboard-toggle {
   display: none;
 }
 
 @media (max-width: 900px) {
-  .financi-fixed-header {
-    width: calc(100% - 24px);
-    margin: 12px auto 14px;
-    padding: 12px;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    border-radius: 22px;
-    background: transparent;
-    border-color: transparent;
+  .topbar,
+  .toolbar,
+  .header-actions,
+  .top-actions,
+  .quick-actions {
+    width: calc(100% - 24px) !important;
+    margin: 12px auto 16px !important;
+    grid-template-columns: minmax(0, 1fr) auto auto auto !important;
+    gap: 8px !important;
   }
 
-  .ffh-brand {
-    width: 100%;
+  .profile-chip,
+  .user-chip,
+  .profile-button,
+  .user-profile {
+    max-width: 145px !important;
+    height: 44px !important;
+    padding: 7px 10px !important;
   }
 
-  .ffh-kicker {
-    display: none;
+  .profile-chip img,
+  .user-chip img,
+  .profile-button img,
+  .user-profile img {
+    width: 30px !important;
+    height: 30px !important;
+    flex-basis: 30px !important;
   }
 
-  .ffh-brand strong {
-    width: fit-content;
-    max-width: 100%;
-    padding: 10px 14px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.075);
-    border: 1px solid var(--ffh-border);
-    font-size: clamp(1.18rem, 6vw, 1.55rem);
-    letter-spacing: -0.7px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .profile-chip span,
+  .user-chip span,
+  .profile-button span,
+  .user-profile span {
+    max-width: 70px !important;
   }
 
-  .ffh-actions {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto auto;
-    gap: 8px;
-    width: 100%;
+  .topbar button,
+  .toolbar button,
+  .header-actions button,
+  .top-actions button,
+  .quick-actions button {
+    height: 44px !important;
+    padding: 0 12px !important;
+    max-width: 120px !important;
+    font-size: .84rem !important;
   }
 
-  .ffh-profile {
-    max-width: 150px;
-    height: 44px;
-    padding: 0 10px;
+  .mobile-menu-button,
+  .menu-toggle,
+  .hamburger,
+  #menuToggle,
+  button[aria-label="Menu"] {
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
   }
 
-  .ffh-name {
-    max-width: 72px;
-  }
-
-  .ffh-btn {
-    height: 44px;
-    padding: 0 12px;
-    font-size: .86rem;
-  }
-
-  .ffh-btn[data-proxy="ocultar"] {
-    max-width: 92px;
-    overflow: hidden;
-  }
-
-  .ffh-menu-btn {
-    height: 44px;
-    width: 46px;
-    min-width: 46px;
-  }
-
-  .ffh-menu {
-    position: fixed;
-    top: 76px;
-    left: 12px;
-    right: 12px;
-    width: auto;
-    max-height: calc(100vh - 96px);
+  .menu-dropdown,
+  .dropdown-menu,
+  .mobile-menu,
+  .side-menu,
+  .drawer {
+    top: 68px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
   }
 
   body.dashboard-mobile-collapsed .dashboard-cards,
@@ -1762,9 +1754,9 @@ header h1,
 
   .mobile-dashboard-toggle {
     display: block !important;
-    width: 100% !important;
+    width: calc(100% - 24px) !important;
     min-height: 48px !important;
-    margin: 10px 0 12px !important;
+    margin: 10px auto 12px !important;
     padding: 13px 16px !important;
     border-radius: 18px !important;
     border: 1px solid rgba(255,255,255,.10) !important;
@@ -1776,46 +1768,275 @@ header h1,
 }
 
 @media (max-width: 430px) {
-  .financi-fixed-header {
-    width: calc(100% - 20px);
-    padding: 10px;
+  .topbar,
+  .toolbar,
+  .header-actions,
+  .top-actions,
+  .quick-actions {
+    width: calc(100% - 20px) !important;
+    grid-template-columns: minmax(0, 1fr) auto auto auto !important;
+    gap: 7px !important;
   }
 
-  .ffh-brand strong {
-    font-size: 1.14rem;
+  .profile-chip,
+  .user-chip,
+  .profile-button,
+  .user-profile {
+    max-width: 120px !important;
   }
 
-  .ffh-actions {
-    grid-template-columns: minmax(0, 1fr) auto auto auto;
-    gap: 7px;
+  .profile-chip span,
+  .user-chip span,
+  .profile-button span,
+  .user-profile span {
+    max-width: 52px !important;
   }
 
-  .ffh-profile {
-    max-width: 120px;
+  .topbar button,
+  .toolbar button,
+  .header-actions button,
+  .top-actions button,
+  .quick-actions button {
+    padding: 0 9px !important;
+    max-width: 88px !important;
+    font-size: .76rem !important;
   }
 
-  .ffh-name {
-    max-width: 52px;
-  }
-
-  .ffh-btn {
-    padding: 0 9px;
-    font-size: .78rem;
-  }
-
-  .ffh-btn[data-proxy="ocultar"] {
-    max-width: 76px;
+  .mobile-menu-button,
+  .menu-toggle,
+  .hamburger,
+  #menuToggle,
+  button[aria-label="Menu"] {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
   }
 }
 
 @media (max-width: 360px) {
-  .ffh-actions {
-    grid-template-columns: 1fr auto auto;
+  .topbar,
+  .toolbar,
+  .header-actions,
+  .top-actions,
+  .quick-actions {
+    grid-template-columns: 1fr auto auto !important;
   }
 
-  .ffh-profile {
-    grid-column: 1 / -1;
-    max-width: 140px;
+  .profile-chip,
+  .user-chip,
+  .profile-button,
+  .user-profile {
+    grid-column: 1 / -1 !important;
+    max-width: 145px !important;
   }
 }
 
+
+
+/* =========================================================
+   FIX FINAL V7 - HEADER ÚNICO E LOGIN LIMPO
+   - Remove qualquer cabeçalho injetado/antigo.
+   - O header oficial fica somente dentro de #appShell.
+   - No mobile mostra apenas: Perfil, Renda, Ocultar e menu.
+========================================================= */
+.ffh-actions,
+.ffh-menu,
+#financiFixedHeader {
+  display: none !important;
+}
+
+body:has(#authScreen:not(.hidden)) .topbar,
+body:has(#authScreen:not(.hidden)) .ffh-actions,
+body:has(#authScreen:not(.hidden)) .ffh-menu {
+  display: none !important;
+}
+
+#appShell.hidden,
+#authScreen.hidden {
+  display: none !important;
+}
+
+/* anula regras genéricas antigas que transformavam qualquer header em hero/card */
+#appShell > header.topbar {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  margin: 0 0 22px 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  position: relative !important;
+  top: auto !important;
+  overflow: visible !important;
+  backdrop-filter: none !important;
+}
+
+#appShell > header.topbar > div:first-child {
+  display: block !important;
+  min-width: 0 !important;
+}
+
+#appShell > header.topbar > div:first-child h1 {
+  display: block !important;
+  height: auto !important;
+  max-width: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  font-size: clamp(28px,4vw,44px) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+#appShell > header.topbar .top-actions.clean-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+#appShell .user-chip,
+#appShell .topbar .ghost-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 46px !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,.075) !important;
+  border: 1px solid rgba(255,255,255,.11) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  white-space: nowrap !important;
+}
+
+#appShell .user-chip {
+  gap: 9px !important;
+  padding: 6px 14px 6px 8px !important;
+  max-width: 210px !important;
+  overflow: hidden !important;
+}
+#appShell .user-chip img,
+#appShell .user-chip .chip-avatar {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+  border-radius: 999px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  background: #7c3aed !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+}
+#appShell .user-chip span:last-child {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+#appShell #openSettingsBtn { min-width: 92px !important; }
+#appShell #toggleValuesBtn { min-width: 126px !important; }
+#appShell #moreMenuBtn {
+  width: 50px !important;
+  min-width: 50px !important;
+  padding: 0 !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+}
+#appShell .menu-wrap { position: relative !important; flex: 0 0 auto !important; }
+#appShell #overflowMenu {
+  position: absolute !important;
+  right: 0 !important;
+  top: calc(100% + 10px) !important;
+  left: auto !important;
+  z-index: 1000 !important;
+}
+
+@media (max-width: 700px) {
+  body {
+    background: #004b2b !important;
+    overflow-x: hidden !important;
+  }
+  #appShell.app-shell {
+    padding: 42px 20px 70px !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  #appShell > header.topbar {
+    display: block !important;
+    margin: 0 0 18px 0 !important;
+  }
+  #appShell > header.topbar > div:first-child {
+    display: none !important;
+  }
+  #appShell > header.topbar .top-actions.clean-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto auto !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  #appShell .user-chip {
+    height: 42px !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 5px 10px 5px 6px !important;
+    justify-content: flex-start !important;
+  }
+  #appShell .user-chip img,
+  #appShell .user-chip .chip-avatar {
+    width: 30px !important;
+    height: 30px !important;
+    flex-basis: 30px !important;
+  }
+  #appShell .topbar .ghost-btn {
+    height: 42px !important;
+    padding: 0 12px !important;
+    font-size: 14px !important;
+    border-radius: 16px !important;
+  }
+  #appShell #openSettingsBtn {
+    min-width: 74px !important;
+    max-width: 82px !important;
+  }
+  #appShell #toggleValuesBtn {
+    min-width: 76px !important;
+    max-width: 86px !important;
+  }
+  #appShell #toggleValuesBtn::after { content: '' !important; }
+  #appShell #moreMenuBtn {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    padding: 0 !important;
+  }
+  #appShell #overflowMenu {
+    position: fixed !important;
+    top: 88px !important;
+    right: 14px !important;
+    left: 14px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  .auth-screen {
+    min-height: 100vh !important;
+    padding: 84px 26px 26px !important;
+    background: #070a12 !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #appShell.app-shell { padding-left: 14px !important; padding-right: 14px !important; }
+  #appShell > header.topbar .top-actions.clean-actions { gap: 7px !important; }
+  #appShell .topbar .ghost-btn { padding: 0 9px !important; font-size: 13px !important; }
+  #appShell #openSettingsBtn { min-width: 68px !important; max-width: 74px !important; }
+  #appShell #toggleValuesBtn { min-width: 68px !important; max-width: 78px !important; }
+  #appShell #moreMenuBtn { width: 44px !important; min-width: 44px !important; max-width: 44px !important; }
+}
