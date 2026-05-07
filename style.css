@@ -2101,3 +2101,200 @@ body:not(.financi-login-mode) #appShell > header.topbar {
   #appShell #toggleValuesBtn { min-width:68px !important; max-width:78px !important; }
   #appShell #moreMenuBtn { width:44px !important; min-width:44px !important; max-width:44px !important; }
 }
+
+/* =========================================================
+   V72 - CABEÇALHO REFEITO DO ZERO
+   Remove o hero antigo, deixa o topo transparente e limpa scrollbar.
+========================================================= */
+html, body {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255,255,255,.16) transparent !important;
+}
+::-webkit-scrollbar { width: 8px !important; height: 8px !important; }
+::-webkit-scrollbar-track { background: transparent !important; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.16) !important;
+  border-radius: 999px !important;
+  border: 2px solid transparent !important;
+  background-clip: content-box !important;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.26) !important; background-clip: content-box !important; }
+
+body.financi-login-mode .new-app-header,
+body.financi-login-mode #appShell { display: none !important; }
+
+#appShell.app-shell {
+  max-width: 1280px !important;
+  margin: 0 auto !important;
+  padding-top: 26px !important;
+}
+
+#appShell > header.topbar.new-app-header,
+body:not(.financi-login-mode) #appShell > header.topbar.new-app-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  min-height: 56px !important;
+  gap: 18px !important;
+  margin: 0 0 24px 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  position: relative !important;
+  top: auto !important;
+  overflow: visible !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+#appShell .new-brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  color: #fff !important;
+  user-select: none !important;
+}
+
+#appShell .new-brand-mark {
+  width: 34px !important;
+  height: 34px !important;
+  display: inline-flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 7px !important;
+  border-radius: 14px !important;
+  background: rgba(255,255,255,.08) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+}
+#appShell .new-brand-mark i {
+  display: block !important;
+  width: 4px !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+}
+#appShell .new-brand-mark i:nth-child(1) { height: 9px !important; opacity: .75 !important; }
+#appShell .new-brand-mark i:nth-child(2) { height: 14px !important; opacity: .88 !important; }
+#appShell .new-brand-mark i:nth-child(3) { height: 20px !important; }
+#appShell .new-brand-text {
+  display: inline-block !important;
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  letter-spacing: -.055em !important;
+  line-height: 1 !important;
+}
+
+#appShell > header.topbar.new-app-header .top-actions.clean-actions.new-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+#appShell .new-app-header .user-chip,
+#appShell .new-app-header .ghost-btn {
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+  padding: 0 17px !important;
+  background: rgba(255,255,255,.075) !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+#appShell .new-app-header .user-chip {
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  padding-left: 7px !important;
+  max-width: 180px !important;
+  overflow: hidden !important;
+}
+#appShell .new-app-header .user-chip img,
+#appShell .new-app-header .user-chip .chip-avatar {
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+  border-radius: 999px !important;
+}
+#appShell .new-app-header #openSettingsBtn { min-width: 86px !important; }
+#appShell .new-app-header #toggleValuesBtn { min-width: 104px !important; }
+#appShell .new-app-header #moreMenuBtn {
+  width: 46px !important;
+  min-width: 46px !important;
+  padding: 0 !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+}
+#appShell .new-app-header .menu-wrap { position: relative !important; flex: 0 0 auto !important; }
+#appShell .new-app-header #overflowMenu {
+  right: 0 !important;
+  left: auto !important;
+  top: calc(100% + 10px) !important;
+}
+
+@media (max-width: 700px) {
+  #appShell.app-shell {
+    padding: 42px 20px 70px !important;
+  }
+  #appShell > header.topbar.new-app-header {
+    display: block !important;
+    min-height: 42px !important;
+    margin-bottom: 18px !important;
+  }
+  #appShell .new-brand { display: none !important; }
+  #appShell > header.topbar.new-app-header .top-actions.clean-actions.new-header-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0,1fr) auto auto auto !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  #appShell .new-app-header .user-chip,
+  #appShell .new-app-header .ghost-btn {
+    height: 42px !important;
+    border-radius: 16px !important;
+    padding: 0 12px !important;
+    font-size: 14px !important;
+  }
+  #appShell .new-app-header .user-chip {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding-left: 6px !important;
+  }
+  #appShell .new-app-header #openSettingsBtn { min-width: 74px !important; max-width: 82px !important; }
+  #appShell .new-app-header #toggleValuesBtn { min-width: 76px !important; max-width: 86px !important; font-size: 0 !important; }
+  #appShell .new-app-header #toggleValuesBtn::before { content: 'Ocultar'; font-size: 14px !important; }
+  #appShell .new-app-header #moreMenuBtn { width: 48px !important; min-width: 48px !important; max-width: 48px !important; }
+  #appShell .new-app-header #overflowMenu {
+    position: fixed !important;
+    top: 88px !important;
+    right: 14px !important;
+    left: 14px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 380px) {
+  #appShell.app-shell { padding-left: 14px !important; padding-right: 14px !important; }
+  #appShell > header.topbar.new-app-header .top-actions.clean-actions.new-header-actions { gap: 7px !important; }
+  #appShell .new-app-header .ghost-btn { padding: 0 9px !important; font-size: 13px !important; }
+  #appShell .new-app-header #openSettingsBtn { min-width: 68px !important; max-width: 74px !important; }
+  #appShell .new-app-header #toggleValuesBtn { min-width: 68px !important; max-width: 78px !important; }
+  #appShell .new-app-header #moreMenuBtn { width: 44px !important; min-width: 44px !important; max-width: 44px !important; }
+}

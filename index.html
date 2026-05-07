@@ -38,15 +38,16 @@
   </section>
 
   <div class="app-shell hidden" id="appShell">
-    <header class="topbar">
-      <div>
-        <span class="eyebrow">Controle financeiro pessoal</span>
-        <h1>Financi App</h1>
+    <header class="topbar new-app-header" aria-label="Cabeçalho principal">
+      <div class="new-brand" aria-label="Financi App">
+        <span class="new-brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="new-brand-text">Financi</span>
       </div>
-      <div class="top-actions clean-actions">
+
+      <nav class="top-actions clean-actions new-header-actions" aria-label="Ações principais">
         <div class="user-chip" id="userChip">Offline</div>
         <button class="ghost-btn main-action" id="openSettingsBtn" type="button">Renda</button>
-        <button class="ghost-btn main-action" id="toggleValuesBtn" type="button">Ocultar valores</button>
+        <button class="ghost-btn main-action" id="toggleValuesBtn" type="button">Ocultar</button>
         <div class="menu-wrap">
           <button class="ghost-btn menu-btn" id="moreMenuBtn" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
           <div class="overflow-menu hidden" id="overflowMenu">
@@ -59,7 +60,7 @@
             <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
           </div>
         </div>
-      </div>
+      </nav>
     </header>
 
     <main class="layout">
