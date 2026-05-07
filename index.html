@@ -169,11 +169,69 @@
       </aside>
     </main>
 
+    <main class="mobile-app-screen" id="mobileAppScreen" aria-label="Tela mobile do Financi App">
+      <section class="m-hero" id="mResumo">
+        <div class="m-hero-copy">
+          <span>Resumo do mês</span>
+          <strong id="mMonthLabel">Mês atual</strong>
+        </div>
+        <button class="m-primary-action" type="button" data-mobile-click="openAccountBtn">+ Conta</button>
+      </section>
+
+      <section class="m-balance-card">
+        <span>Saldo disponível</span>
+        <strong id="mMonthBalance">R$ 0,00</strong>
+        <small id="mHealthText">Configure sua renda e adicione contas.</small>
+      </section>
+
+      <section class="m-metrics-row" aria-label="Indicadores do mês">
+        <article><span>Receita</span><strong id="mNetIncomeMetric">R$ 0,00</strong></article>
+        <article><span>Contas</span><strong id="mMonthTotal">R$ 0,00</strong></article>
+        <article><span>Risco</span><strong id="mRiskMetric">0%</strong></article>
+      </section>
+
+      <section class="m-actions-grid" aria-label="Ações principais">
+        <button type="button" data-mobile-click="openSettingsBtn"><b>R$</b><span>Renda</span></button>
+        <button type="button" data-mobile-click="openProfileBtn"><b>☻</b><span>Perfil</span></button>
+        <button type="button" data-mobile-click="openGroupBtn"><b>👥</b><span>Grupo</span></button>
+        <button type="button" data-mobile-click="exportBtn"><b>⇩</b><span>Exportar</span></button>
+      </section>
+
+      <section class="m-section" id="mContas">
+        <div class="m-section-head">
+          <div><span>Contas</span><h2>Próximos pagamentos</h2></div>
+          <button type="button" data-mobile-click="openAccountBtn">Adicionar</button>
+        </div>
+        <div class="m-filter-row" id="mCategoryFilters"></div>
+        <div class="m-bill-list" id="mBillList"></div>
+      </section>
+
+      <section class="m-section" id="mAgenda">
+        <div class="m-section-head">
+          <div><span>Agenda</span><h2>Vencimentos</h2></div>
+        </div>
+        <div class="m-due-list" id="mDueList"></div>
+      </section>
+
+      <section class="m-section" id="mMais">
+        <div class="m-section-head">
+          <div><span>Mais</span><h2>Detalhes do mês</h2></div>
+        </div>
+        <div class="m-detail-list">
+          <div><span>Contas ativas</span><strong id="mActiveAccounts">0</strong></div>
+          <div><span>Pago neste mês</span><strong id="mPaidThisMonth">R$ 0,00</strong></div>
+          <div><span>Falta pagar</span><strong id="mUnpaidThisMonth">R$ 0,00</strong></div>
+          <div><span>Saldo após pagos</span><strong id="mCashAfterPaid">R$ 0,00</strong></div>
+        </div>
+      </section>
+    </main>
+
+
     <nav class="mobile-bottom-nav" aria-label="Menu inferior mobile">
-      <a href="#mobileResumo">Resumo</a>
-      <a href="#mobileContas">Contas</a>
-      <a href="#mobileCalendario">Agenda</a>
-      <a href="#mobileMais">Mais</a>
+      <a href="#mResumo">Resumo</a>
+      <a href="#mContas">Contas</a>
+      <a href="#mAgenda">Agenda</a>
+      <a href="#mMais">Mais</a>
     </nav>
   </div>
 

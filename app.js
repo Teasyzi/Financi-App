@@ -181,7 +181,52 @@ function render(){
   $('riskBar').style.width=`${Math.min(100,Math.round(commitment))}%`;
   $('riskBar').className=risk.cls;
   renderFilters();renderCalendar(allPayments);renderBills(payments);renderInterest();renderMonthGrid();renderFamilyPanel();
+  renderMobileApp({salary,allPayments,payments,total,paidTotal,unpaidTotal,balance,cashAfterPaid,commitment,risk});
 }
+
+function renderMobileApp(data){
+  const box=document.getElementById('mobileAppScreen');
+  if(!box||!data)return;
+  const {salary,allPayments,payments,total,paidTotal,unpaidTotal,balance,cashAfterPaid,commitment,risk}=data;
+  const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value};
+  set('mMonthLabel',`${MONTHS[viewDate.getMonth()]} ${viewDate.getFullYear()}`);
+  set('mNetIncomeMetric',money(salary.net));
+  set('mMonthTotal',money(total));
+  set('mMonthBalance',money(balance));
+  set('mRiskMetric',salary.net?`${Math.round(commitment)}%`:'0%');
+  set('mActiveAccounts',allPayments.length);
+  set('mPaidThisMonth',money(paidTotal));
+  set('mUnpaidThisMonth',money(unpaidTotal));
+  set('mCashAfterPaid',money(cashAfterPaid));
+  set('mHealthText',salary.net?`${risk.title}. Sobram ${money(balance)} depois das contas do mês.`:'Informe sua renda para calcular o saldo do mês.');
+  const bal=document.getElementById('mMonthBalance');if(bal)bal.style.color=balance<0?'var(--bad)':'var(--good)';
+  const riskEl=document.getElementById('mRiskMetric');if(riskEl)riskEl.style.color=commitment>50?'var(--bad)':commitment>30?'var(--warn)':'var(--good)';
+
+  const filters=document.getElementById('mCategoryFilters');
+  if(filters){
+    const cats=['Todas',...CATEGORIES];
+    filters.innerHTML=cats.map(c=>`<button type="button" class="m-filter ${activeCategory===c?'active':''}" data-m-filter="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('');
+    filters.querySelectorAll('[data-m-filter]').forEach(btn=>btn.onclick=()=>{activeCategory=btn.dataset.mFilter;render()});
+  }
+
+  const list=document.getElementById('mBillList');
+  if(list){
+    list.innerHTML=payments.length?payments.map(({account,payment})=>{
+      const paid=isPaymentPaid(account,payment);const due=payment.due?formatDate(payment.due):'Sem data';
+      return `<article class="m-bill-card ${paid?'paid':''}"><button type="button" class="m-bill-open" data-edit="${account.id}"><span>${escapeHtml(account.category||'Outros')}</span><strong>${escapeHtml(account.name)}</strong><small>${payment.label} • ${due}</small></button><div><b>${money(payment.value)}</b><button class="m-paid-btn ${paid?'active':''}" type="button" data-paid="${account.id}" data-key="${paymentKey(account,payment)}">${paid?'Paga':'Pagar'}</button></div></article>`
+    }).join(''):'<div class="m-empty">Nenhuma conta ativa neste mês.</div>';
+    list.querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=()=>openAccount(btn.dataset.edit));
+    list.querySelectorAll('[data-paid]').forEach(btn=>btn.onclick=()=>{const item=payments.find(x=>paymentKey(x.account,x.payment)===btn.dataset.key);if(item)setPaymentPaid(item.account,item.payment,!isPaymentPaid(item.account,item.payment));});
+  }
+
+  const dueList=document.getElementById('mDueList');
+  if(dueList){
+    const ordered=[...allPayments].sort((a,b)=>(a.payment.due||0)-(b.payment.due||0));
+    dueList.innerHTML=ordered.length?ordered.slice(0,12).map(({account,payment})=>`<button type="button" class="m-due-item" data-edit="${account.id}"><span>${payment.due?String(payment.due.getDate()).padStart(2,'0'):'--'}</span><div><strong>${escapeHtml(account.name)}</strong><small>${payment.status||'Em dia'} • ${money(payment.value)}</small></div></button>`).join(''):'<div class="m-empty">Sem vencimentos neste mês.</div>';
+    dueList.querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=()=>openAccount(btn.dataset.edit));
+  }
+}
+
 function renderCalendar(allPayments){
   const first=new Date(viewDate.getFullYear(),viewDate.getMonth(),1);
   const daysInMonth=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,0).getDate();

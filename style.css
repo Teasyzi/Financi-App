@@ -171,3 +171,60 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
   .mobile-quick-actions{grid-template-columns:1fr 1fr}
   .mobile-quick-actions button:last-child{grid-column:1/-1}
 }
+
+/* V5.6 - tela mobile realmente separada, com variáveis próprias.
+   Desktop continua usando .layout original; celular usa .mobile-app-screen. */
+.mobile-app-screen{display:none}
+
+@media (max-width:760px){
+  :root{
+    --m-bg:#07111f;
+    --m-surface:rgba(16,24,39,.94);
+    --m-surface-2:rgba(11,18,32,.96);
+    --m-border:rgba(148,163,184,.16);
+    --m-text:#f8fafc;
+    --m-muted:#94a3b8;
+    --m-accent:#60a5fa;
+    --m-radius:24px;
+    --m-shadow:0 16px 38px rgba(0,0,0,.28);
+  }
+
+  body{background:linear-gradient(180deg,var(--m-bg),#070a12 68%)!important;overflow-x:hidden!important}
+  .app-shell{padding:76px 12px 96px!important;max-width:none!important;width:100%!important}
+
+  /* Esconde o layout desktop/tablet no celular. Ele continua existindo para o JS,
+     mas quem usa celular vê uma tela nova, mais parecida com aplicativo. */
+  .app-shell>.layout{display:none!important}
+  .mobile-app-screen{display:grid;gap:14px;width:100%;max-width:100%;min-width:0}
+
+  .mobile-appbar{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .mobile-title,.mobile-title span,.mobile-title strong{background:transparent!important;border:0!important;box-shadow:none!important}
+  .mobile-title span,.mobile-title strong{text-shadow:0 2px 14px rgba(0,0,0,.5)}
+
+  .m-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 2px 0;min-width:0}
+  .m-hero-copy{min-width:0}.m-hero-copy span,.m-section-head span,.m-balance-card span,.m-metrics-row span,.m-detail-list span{display:block;color:var(--m-muted);font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:900}
+  .m-hero-copy strong{display:block;color:var(--m-text);font-size:25px;line-height:1.05;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:58vw}
+  .m-primary-action,.m-section-head button{border:0;border-radius:17px;background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;font-weight:900;padding:12px 14px;white-space:nowrap;box-shadow:0 12px 26px rgba(37,99,235,.22)}
+
+  .m-balance-card,.m-section,.m-metrics-row article,.m-actions-grid button{background:var(--m-surface);border:1px solid var(--m-border);border-radius:var(--m-radius);box-shadow:var(--m-shadow);min-width:0;overflow:hidden}
+  .m-balance-card{padding:18px}.m-balance-card strong{display:block;margin-top:6px;font-size:34px;letter-spacing:-.06em;line-height:1}.m-balance-card small{display:block;margin-top:10px;color:#cbd5e1;line-height:1.45;overflow-wrap:anywhere}
+
+  .m-metrics-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.m-metrics-row article{padding:13px}.m-metrics-row strong{display:block;margin-top:6px;font-size:15px;line-height:1.1;overflow-wrap:anywhere}
+
+  .m-actions-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.m-actions-grid button{border-radius:20px;color:var(--m-text);padding:13px 6px;min-height:70px;display:grid;place-items:center;border-color:var(--m-border)}.m-actions-grid b{font-size:19px;line-height:1}.m-actions-grid span{font-size:11px;font-weight:900;color:#dbeafe}
+
+  .m-section{padding:14px}.m-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.m-section-head h2{font-size:19px;margin-top:2px}.m-section-head button{padding:10px 12px;font-size:12px}
+  .m-filter-row{display:flex;gap:8px;overflow-x:auto;margin:0 -14px 12px;padding:0 14px 6px;scrollbar-width:none}.m-filter-row::-webkit-scrollbar{display:none}.m-filter{flex:0 0 auto;border:1px solid var(--m-border);border-radius:999px;background:var(--m-surface-2);color:#cbd5e1;padding:8px 11px;font-size:12px;font-weight:900}.m-filter.active{background:rgba(96,165,250,.2);border-color:rgba(96,165,250,.48);color:#fff}
+
+  .m-bill-list,.m-due-list,.m-detail-list{display:grid;gap:10px}.m-bill-card{display:grid;grid-template-columns:minmax(0,1fr)auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--m-border);border-radius:20px;background:linear-gradient(180deg,rgba(30,64,175,.22),rgba(11,18,32,.98));min-width:0}.m-bill-open{min-width:0;text-align:left;border:0;background:transparent;color:#fff;padding:0}.m-bill-open span{display:block;color:#93c5fd;font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:900}.m-bill-open strong{display:block;margin-top:3px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.m-bill-open small{display:block;margin-top:4px;color:#cbd5e1;font-size:12px;overflow-wrap:anywhere}.m-bill-card>div{text-align:right}.m-bill-card b{display:block;font-size:16px;white-space:nowrap}.m-paid-btn{margin-top:7px;border:1px solid rgba(96,165,250,.3);border-radius:999px;background:rgba(96,165,250,.12);color:#dbeafe;padding:7px 10px;font-size:11px;font-weight:900}.m-paid-btn.active{background:rgba(34,197,94,.18);border-color:rgba(34,197,94,.36);color:#bbf7d0}
+
+  .m-due-item{display:grid;grid-template-columns:44px minmax(0,1fr);gap:11px;align-items:center;text-align:left;border:1px solid var(--m-border);border-radius:18px;background:var(--m-surface-2);color:#fff;padding:10px}.m-due-item>span{display:grid;place-items:center;width:44px;height:44px;border-radius:15px;background:rgba(96,165,250,.14);color:#bfdbfe;font-weight:900}.m-due-item strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.m-due-item small{display:block;margin-top:3px;color:#cbd5e1;font-size:12px;overflow-wrap:anywhere}
+
+  .m-detail-list div{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--m-border);background:var(--m-surface-2);border-radius:18px;padding:12px;min-width:0}.m-detail-list strong{overflow-wrap:anywhere;text-align:right}.m-empty{border:1px dashed var(--m-border);border-radius:18px;color:var(--m-muted);padding:18px;text-align:center;background:rgba(11,18,32,.55)}
+
+  .mobile-bottom-nav{left:10px!important;right:10px!important;bottom:10px!important}
+}
+
+@media (max-width:380px){
+  .m-metrics-row{grid-template-columns:1fr}.m-actions-grid{grid-template-columns:1fr 1fr}.m-bill-card{grid-template-columns:1fr}.m-bill-card>div{text-align:left}.m-bill-card b{white-space:normal}.m-hero-copy strong{font-size:22px;max-width:54vw}
+}
