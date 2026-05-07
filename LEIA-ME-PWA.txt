@@ -1,0 +1,16 @@
+FINANCI APP - PWA INSTALÁVEL
+
+Correção v61:
+- Ícones PWA refeitos como PNG opacos, sem canal alpha/transparência.
+- Adicionados tamanhos 48, 72, 96, 128, 144, 152, 180, 192, 384 e 512.
+- Adicionados ícones maskable 192, 384 e 512 com área segura.
+- Manifest ajustado com start_url/scope em ./ para funcionar em subpastas.
+- Service Worker atualizado para cachear todos os novos ícones.
+
+Checklist para aparecer como instalável:
+1. Publique em HTTPS ou teste em localhost. file:// não funciona.
+2. Depois de subir a nova versão, limpe dados do site ou force atualização do service worker.
+3. No Chrome/Edge, abra DevTools > Application > Manifest. Se aparecer erro, ele dirá exatamente qual arquivo não carregou.
+4. Verifique se /manifest.json, /sw.js e os ícones abrem diretamente pelo navegador com status 200.
+
+Se estiver em hospedagem por subpasta, deixe todos os arquivos juntos na mesma pasta do index.html.

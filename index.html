@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Financi App" />
-  <link rel="manifest" href="./manifest.json" />
+  <link rel="manifest" href="./manifest.json" type="application/manifest+json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="style.css" />
   <title>Financi App</title>
@@ -399,6 +399,7 @@
     </form>
   </dialog>
   <input type="file" id="importFile" accept="application/json" hidden />
+  <script src="pwa.js" defer></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>
