@@ -178,6 +178,15 @@
         <button class="m-primary-action" type="button" data-mobile-click="openAccountBtn">+ Conta</button>
       </section>
 
+      <section class="m-month-switch" aria-label="Trocar mês no mobile">
+        <button type="button" id="mPrevMonthBtn" aria-label="Mês anterior">‹</button>
+        <div>
+          <span>Mês selecionado</span>
+          <strong id="mMonthSwitchLabel">Mês atual</strong>
+        </div>
+        <button type="button" id="mNextMonthBtn" aria-label="Próximo mês">›</button>
+      </section>
+
       <section class="m-balance-card">
         <span>Saldo disponível</span>
         <strong id="mMonthBalance">R$ 0,00</strong>
@@ -208,8 +217,10 @@
 
       <section class="m-section" id="mAgenda">
         <div class="m-section-head">
-          <div><span>Agenda</span><h2>Vencimentos</h2></div>
+          <div><span>Agenda</span><h2>Calendário do mês</h2></div>
         </div>
+        <div class="m-calendar-grid" id="mCalendarGrid"></div>
+        <div class="m-agenda-subtitle">Vencimentos do mês</div>
         <div class="m-due-list" id="mDueList"></div>
       </section>
 

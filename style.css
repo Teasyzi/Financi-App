@@ -228,3 +228,25 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
 @media (max-width:380px){
   .m-metrics-row{grid-template-columns:1fr}.m-actions-grid{grid-template-columns:1fr 1fr}.m-bill-card{grid-template-columns:1fr}.m-bill-card>div{text-align:left}.m-bill-card b{white-space:normal}.m-hero-copy strong{font-size:22px;max-width:54vw}
 }
+
+/* V5.7 - agenda mensal completa no mobile, troca de mês e cabeçalho sem fixar */
+@media (max-width:760px){
+  .app-shell{padding-top:12px!important}
+  .mobile-appbar{position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:20!important;margin:0 0 10px!important;padding:10px 10px 4px!important;background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .mobile-more-panel{top:50px;right:0;z-index:100}
+
+  .m-month-switch{display:grid;grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;gap:10px;background:var(--m-surface);border:1px solid var(--m-border);border-radius:var(--m-radius);box-shadow:var(--m-shadow);padding:10px;min-width:0;overflow:hidden}
+  .m-month-switch button{width:48px;height:48px;border:1px solid rgba(96,165,250,.3);border-radius:18px;background:rgba(96,165,250,.12);color:#fff;font-size:30px;font-weight:900;line-height:1}
+  .m-month-switch div{min-width:0;text-align:center}.m-month-switch span{display:block;color:var(--m-muted);font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:900}.m-month-switch strong{display:block;margin-top:3px;color:var(--m-text);font-size:18px;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .m-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-bottom:14px;min-width:0;width:100%}
+  .m-calendar-weekday{text-align:center;color:var(--m-muted);font-size:10px;font-weight:900;padding:4px 0}
+  .m-calendar-day{min-width:0;min-height:54px;border:1px solid var(--m-border);border-radius:14px;background:var(--m-surface-2);color:#fff;padding:6px 4px;text-align:left;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+  .m-calendar-day.muted{background:transparent;border-color:transparent;box-shadow:none}
+  .m-calendar-day span{font-size:12px;font-weight:900}.m-calendar-day b{font-size:9px;color:#bfdbfe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.m-calendar-day small{font-size:8px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.m-calendar-day.has-bills{border-color:rgba(96,165,250,.45);background:linear-gradient(180deg,rgba(37,99,235,.22),rgba(11,18,32,.98))}
+  .m-agenda-subtitle{margin:4px 0 10px;color:var(--m-muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:900}
+}
+
+@media (max-width:380px){
+  .m-calendar-grid{gap:4px}.m-calendar-day{min-height:48px;border-radius:12px;padding:5px 3px}.m-calendar-day b{font-size:8px}.m-calendar-day small{display:none}.m-month-switch{grid-template-columns:44px minmax(0,1fr) 44px}.m-month-switch button{width:44px;height:44px}
+}

@@ -190,6 +190,7 @@ function renderMobileApp(data){
   const {salary,allPayments,payments,total,paidTotal,unpaidTotal,balance,cashAfterPaid,commitment,risk}=data;
   const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value};
   set('mMonthLabel',`${MONTHS[viewDate.getMonth()]} ${viewDate.getFullYear()}`);
+  set('mMonthSwitchLabel',`${MONTHS[viewDate.getMonth()]} ${viewDate.getFullYear()}`);
   set('mNetIncomeMetric',money(salary.net));
   set('mMonthTotal',money(total));
   set('mMonthBalance',money(balance));
@@ -219,12 +220,44 @@ function renderMobileApp(data){
     list.querySelectorAll('[data-paid]').forEach(btn=>btn.onclick=()=>{const item=payments.find(x=>paymentKey(x.account,x.payment)===btn.dataset.key);if(item)setPaymentPaid(item.account,item.payment,!isPaymentPaid(item.account,item.payment));});
   }
 
+  renderMobileCalendar(allPayments);
+
   const dueList=document.getElementById('mDueList');
   if(dueList){
     const ordered=[...allPayments].sort((a,b)=>(a.payment.due||0)-(b.payment.due||0));
     dueList.innerHTML=ordered.length?ordered.slice(0,12).map(({account,payment})=>`<button type="button" class="m-due-item" data-edit="${account.id}"><span>${payment.due?String(payment.due.getDate()).padStart(2,'0'):'--'}</span><div><strong>${escapeHtml(account.name)}</strong><small>${payment.status||'Em dia'} • ${money(payment.value)}</small></div></button>`).join(''):'<div class="m-empty">Sem vencimentos neste mês.</div>';
     dueList.querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=()=>openAccount(btn.dataset.edit));
   }
+}
+
+function renderMobileCalendar(allPayments){
+  const grid=document.getElementById('mCalendarGrid');
+  if(!grid)return;
+  const first=new Date(viewDate.getFullYear(),viewDate.getMonth(),1);
+  const daysInMonth=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,0).getDate();
+  const offset=first.getDay();
+  const byDay={};
+  allPayments.forEach(x=>{const d=x.payment.due?x.payment.due.getDate():1;(byDay[d] ||= []).push(x)});
+  const cells=[];
+  ['D','S','T','Q','Q','S','S'].forEach(w=>cells.push(`<div class="m-calendar-weekday">${w}</div>`));
+  for(let i=0;i<offset;i++)cells.push('<div class="m-calendar-day muted"></div>');
+  for(let day=1;day<=daysInMonth;day++){
+    const items=byDay[day]||[];
+    const dayTotal=items.reduce((sum,x)=>sum+(x.payment.value||0),0);
+    cells.push(`<button type="button" class="m-calendar-day ${items.length?'has-bills':''}" data-m-day="${day}"><span>${day}</span>${items.length?`<b>${money(dayTotal)}</b><small>${items.length} conta${items.length>1?'s':''}</small>`:''}</button>`);
+  }
+  grid.innerHTML=cells.join('');
+  grid.querySelectorAll('[data-m-day]').forEach(btn=>btn.onclick=()=>{
+    const items=byDay[Number(btn.dataset.mDay)]||[];
+    if(items.length){
+      const dueList=document.getElementById('mDueList');
+      if(dueList){
+        dueList.innerHTML=items.map(({account,payment})=>`<button type="button" class="m-due-item" data-edit="${account.id}"><span>${payment.due?String(payment.due.getDate()).padStart(2,'0'):'--'}</span><div><strong>${escapeHtml(account.name)}</strong><small>${payment.status||'Em dia'} • ${money(payment.value)}</small></div></button>`).join('');
+        dueList.querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=()=>openAccount(btn.dataset.edit));
+        dueList.scrollIntoView({behavior:'smooth',block:'nearest'});
+      }
+    }
+  });
 }
 
 function renderCalendar(allPayments){
