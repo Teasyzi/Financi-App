@@ -260,3 +260,8 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
   .m-install-pwa-btn{border-radius:20px;color:var(--m-text);padding:13px 6px;min-height:70px;display:grid;place-items:center;border:1px solid rgba(96,165,250,.35);background:rgba(37,99,235,.18)}
   .m-install-pwa-btn b{font-size:19px;line-height:1}.m-install-pwa-btn span{font-size:11px;font-weight:900;color:#dbeafe}
 }
+
+/* V5.9 - menu mobile fecha ao clicar fora e painel acima da tela */
+@media (max-width:760px){
+  .mobile-more[open] .mobile-more-panel{z-index:9999}
+}

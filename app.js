@@ -510,11 +510,27 @@ window.addEventListener('load',()=>{
   if(isRunningStandalone()) setInstallButtonsVisible(false);
 });
 
-if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      await navigator.serviceWorker.register('./sw.js', { scope: './' });
+      if (navigator.serviceWorker.controller) {
+        window.dispatchEvent(new Event('financi-pwa-ready'));
+      } else {
+        navigator.serviceWorker.ready.then(() => window.dispatchEvent(new Event('financi-pwa-ready')));
+      }
+    } catch (err) {
+      console.warn('Service worker não registrado:', err);
+    }
+  });
+}
 showLoggedOut();
 initAuth();
 
 /* V5.4 - controles mobile independentes; não altera o layout desktop */
+function closeMobileMoreMenus(){
+  document.querySelectorAll('.mobile-more[open]').forEach(d=>d.removeAttribute('open'));
+}
 function setupMobileShell(){
   const syncMonth=()=>{const src=document.getElementById('currentMonthLabel');const dst=document.getElementById('mobileMonthLabel');if(src&&dst)dst.textContent=src.textContent||'Mês atual'};
   syncMonth();
@@ -523,13 +539,22 @@ function setupMobileShell(){
   document.querySelectorAll('[data-mobile-click]').forEach(btn=>btn.addEventListener('click',()=>{
     const target=document.getElementById(btn.dataset.mobileClick);
     target?.click();
-    document.querySelectorAll('.mobile-more[open]').forEach(d=>d.removeAttribute('open'));
+    closeMobileMoreMenus();
   }));
   document.querySelectorAll('[data-mobile-scroll]').forEach(btn=>btn.addEventListener('click',()=>{
     document.getElementById(btn.dataset.mobileScroll)?.scrollIntoView({behavior:'smooth',block:'start'});
+    closeMobileMoreMenus();
   }));
-  document.querySelectorAll('.mobile-bottom-nav a').forEach(link=>link.addEventListener('click',()=>{
-    document.querySelectorAll('.mobile-more[open]').forEach(d=>d.removeAttribute('open'));
-  }));
+  document.querySelectorAll('.mobile-bottom-nav a').forEach(link=>link.addEventListener('click',closeMobileMoreMenus));
+
+  document.addEventListener('pointerdown',(event)=>{
+    const opened=document.querySelector('.mobile-more[open]');
+    if(!opened) return;
+    if(!opened.contains(event.target)) closeMobileMoreMenus();
+  },true);
+
+  document.addEventListener('keydown',(event)=>{
+    if(event.key==='Escape') closeMobileMoreMenus();
+  });
 }
 setupMobileShell();
