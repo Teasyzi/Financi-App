@@ -394,3 +394,20 @@ $('joinInviteBtn')?.addEventListener('click',async()=>{
 if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
 showLoggedOut();
 initAuth();
+
+// V5.3 - comportamento responsivo dos menus no celular
+function syncResponsiveMenus(){
+  const isMobile = window.matchMedia('(max-width: 760px)').matches;
+  const actionsMenu = document.querySelector('.top-actions-menu');
+  const sideDetails = document.querySelector('.mobile-side-details');
+  if(actionsMenu) actionsMenu.open = !isMobile;
+  if(sideDetails) sideDetails.open = !isMobile;
+}
+window.addEventListener('DOMContentLoaded', () => {
+  syncResponsiveMenus();
+  window.addEventListener('resize', syncResponsiveMenus);
+  document.querySelectorAll('.top-actions button').forEach(btn => btn.addEventListener('click', () => {
+    const actionsMenu = document.querySelector('.top-actions-menu');
+    if(window.matchMedia('(max-width: 760px)').matches && actionsMenu) actionsMenu.open = false;
+  }));
+});

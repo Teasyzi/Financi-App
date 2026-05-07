@@ -28,15 +28,21 @@
         <span class="eyebrow">Controle financeiro pessoal</span>
         <h1>Financi App</h1>
       </div>
-      <div class="top-actions">
-        <div class="user-chip" id="userChip">Offline</div>
-        <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
-        <button class="ghost-btn" id="importBtn" type="button">Importar</button>
-        <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
-        <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
-        <button class="ghost-btn" id="openGroupBtn" type="button">Grupo</button>
-        <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
-      </div>
+      <details class="top-actions-menu" open>
+        <summary class="menu-trigger" aria-label="Abrir menu de ações">
+          <span>Menu</span>
+          <b>☰</b>
+        </summary>
+        <div class="top-actions">
+          <div class="user-chip" id="userChip">Offline</div>
+          <button class="ghost-btn" id="openSettingsBtn" type="button">Renda e saldo</button>
+          <button class="ghost-btn" id="openProfileBtn" type="button">Perfil</button>
+          <button class="ghost-btn" id="openGroupBtn" type="button">Grupo</button>
+          <button class="ghost-btn" id="exportBtn" type="button">Exportar</button>
+          <button class="ghost-btn" id="importBtn" type="button">Importar</button>
+          <button class="ghost-btn" id="logoutBtn" type="button">Sair</button>
+        </div>
+      </details>
     </header>
 
     <main class="layout">
@@ -88,6 +94,12 @@
       </section>
 
       <aside class="side-panel">
+        <details class="mobile-side-details" open>
+          <summary class="mobile-side-summary">
+            <span>Resumo e opções extras</span>
+            <b>⌄</b>
+          </summary>
+          <div class="side-panel-inner">
         <section class="card health-card">
           <span class="eyebrow">Visão rápida</span>
           <h2 id="healthTitle">Tudo certo</h2>
@@ -141,6 +153,8 @@
           </div>
           <div id="interestList" class="interest-list"></div>
         </section>
+          </div>
+        </details>
       </aside>
     </main>
   </div>
