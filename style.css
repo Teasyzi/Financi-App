@@ -265,3 +265,110 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
 @media (max-width:760px){
   .mobile-more[open] .mobile-more-panel{z-index:9999}
 }
+
+/* V6.2 - correção de rolagem em abas/modais no mobile
+   Quando um dialog/menu está aberto, o fundo não deve rolar; só o conteúdo da aba. */
+@media (max-width:760px){
+  html.mobile-dialog-open,
+  body.mobile-dialog-open{
+    overflow:hidden!important;
+    height:100%!important;
+    overscroll-behavior:none!important;
+    touch-action:none;
+  }
+
+  body.mobile-dialog-open .app-shell,
+  body.mobile-dialog-open .mobile-bottom-nav{
+    pointer-events:none;
+  }
+
+  body.mobile-dialog-open dialog.modal,
+  body.mobile-dialog-open dialog.modal *{
+    pointer-events:auto;
+    touch-action:auto;
+  }
+
+  dialog.modal[open]{
+    position:fixed!important;
+    inset:0!important;
+    width:100dvw!important;
+    max-width:100dvw!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    padding:10px!important;
+    overflow:hidden!important;
+    overscroll-behavior:contain!important;
+    background:transparent!important;
+  }
+
+  dialog.modal[open]::backdrop{
+    background:rgba(2,6,23,.76)!important;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+
+  dialog.modal[open] > .modal-card,
+  dialog.modal[open] > form.modal-card{
+    width:100%!important;
+    max-width:calc(100dvw - 20px)!important;
+    height:auto!important;
+    max-height:calc(100dvh - 20px)!important;
+    margin:0 auto!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    touch-action:pan-y!important;
+    border-radius:24px!important;
+    padding:16px!important;
+  }
+
+  .modal-head{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:#0f172a;
+    margin:-16px -16px 14px;
+    padding:16px 16px 12px;
+    border-bottom:1px solid rgba(148,163,184,.14);
+  }
+
+  .modal-actions{
+    position:sticky;
+    bottom:0;
+    z-index:5;
+    background:#0f172a;
+    margin:16px -16px -16px!important;
+    padding:12px 16px 16px;
+    border-top:1px solid rgba(148,163,184,.14);
+  }
+
+  .profile-modal-card,
+  .group-modal-card{
+    max-width:calc(100dvw - 20px)!important;
+  }
+
+  .income-mode-card,
+  .salary-person-card,
+  .profile-preview,
+  .group-details,
+  .deductions,
+  .smart-options,
+  .calc-preview,
+  .salary-preview{
+    overflow:visible!important;
+  }
+
+  .benefit-row{
+    grid-template-columns:1fr!important;
+  }
+
+  .toggle-row{
+    align-items:flex-start;
+  }
+
+  .toggle-row span{
+    line-height:1.35;
+  }
+}

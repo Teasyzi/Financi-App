@@ -505,3 +505,55 @@ function setupMobileShell(){
   });
 }
 setupMobileShell();
+
+/* V6.2 - trava o fundo e libera rolagem interna dos modais no mobile */
+(function setupMobileDialogScrollLock(){
+  const dialogs=[...document.querySelectorAll('dialog.modal')];
+  let lockedScrollY=0;
+  const isMobile=()=>window.matchMedia('(max-width: 760px)').matches;
+  const anyOpen=()=>dialogs.some(d=>d.open);
+
+  function lockPage(){
+    if(!isMobile()) return;
+    if(document.body.classList.contains('mobile-dialog-open')) return;
+    lockedScrollY=window.scrollY||document.documentElement.scrollTop||0;
+    document.documentElement.classList.add('mobile-dialog-open');
+    document.body.classList.add('mobile-dialog-open');
+    document.body.style.position='fixed';
+    document.body.style.top=`-${lockedScrollY}px`;
+    document.body.style.left='0';
+    document.body.style.right='0';
+    document.body.style.width='100%';
+  }
+
+  function unlockPage(){
+    if(anyOpen()) return;
+    document.documentElement.classList.remove('mobile-dialog-open');
+    document.body.classList.remove('mobile-dialog-open');
+    document.body.style.position='';
+    document.body.style.top='';
+    document.body.style.left='';
+    document.body.style.right='';
+    document.body.style.width='';
+    if(isMobile()) window.scrollTo(0,lockedScrollY);
+  }
+
+  dialogs.forEach(dialog=>{
+    new MutationObserver(()=>{
+      if(dialog.open){
+        lockPage();
+        const card=dialog.querySelector('.modal-card');
+        if(card) card.scrollTop=0;
+      }else{
+        unlockPage();
+      }
+    }).observe(dialog,{attributes:true,attributeFilter:['open']});
+    dialog.addEventListener('close',unlockPage);
+    dialog.addEventListener('cancel',unlockPage);
+  });
+
+  window.addEventListener('resize',()=>{
+    if(!isMobile()) unlockPage();
+    else if(anyOpen()) lockPage();
+  });
+})();
