@@ -212,10 +212,15 @@ function renderMobileApp(data){
 
   const list=document.getElementById('mBillList');
   if(list){
-    list.innerHTML=payments.length?payments.map(({account,payment})=>{
+    const future=state.accounts.filter(a=>accountStatus(a,viewDate)==='future'&&(activeCategory==='Todas'||(a.category||'Outros')===activeCategory));
+    const finished=state.accounts.filter(a=>accountStatus(a,viewDate)==='finished'&&(activeCategory==='Todas'||(a.category||'Outros')===activeCategory));
+    const currentHtml=payments.length?payments.map(({account,payment})=>{
       const paid=isPaymentPaid(account,payment);const due=payment.due?formatDate(payment.due):'Sem data';
       return `<article class="m-bill-card ${paid?'paid':''}"><button type="button" class="m-bill-open" data-edit="${account.id}"><span>${escapeHtml(account.category||'Outros')}</span><strong>${escapeHtml(account.name)}</strong><small>${payment.label} • ${due}</small></button><div><b>${money(payment.value)}</b><button class="m-paid-btn ${paid?'active':''}" type="button" data-paid="${account.id}" data-key="${paymentKey(account,payment)}">${paid?'Paga':'Pagar'}</button></div></article>`
     }).join(''):'<div class="m-empty">Nenhuma conta ativa neste mês.</div>';
+    const futureHtml=future.length?`<div class="m-list-subtitle">Futuras</div>${future.slice(0,8).map(a=>`<article class="m-bill-card muted-card"><button type="button" class="m-bill-open" data-edit="${a.id}"><span>${escapeHtml(a.category||'Outros')}</span><strong>${escapeHtml(a.name)}</strong><small>Começa em ${formatDate(parseDate(a.firstPaymentDate||a.purchaseDate))}</small></button><div><b>${money(a.type==='fixed'?a.fixedValue:a.installmentValue)}</b></div></article>`).join('')}`:'';
+    const finishedHtml=finished.length?`<div class="m-list-subtitle">Finalizadas</div>${finished.slice(0,5).map(a=>`<article class="m-bill-card muted-card"><button type="button" class="m-bill-open" data-edit="${a.id}"><span>${escapeHtml(a.category||'Outros')}</span><strong>${escapeHtml(a.name)}</strong><small>Finalizada</small></button><div><b>${money(accountTotalPaid(a))}</b></div></article>`).join('')}`:'';
+    list.innerHTML=`<div class="m-list-subtitle">Em andamento</div>${currentHtml}${futureHtml}${finishedHtml}`;
     list.querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=()=>openAccount(btn.dataset.edit));
     list.querySelectorAll('[data-paid]').forEach(btn=>btn.onclick=()=>{const item=payments.find(x=>paymentKey(x.account,x.payment)===btn.dataset.key);if(item)setPaymentPaid(item.account,item.payment,!isPaymentPaid(item.account,item.payment));});
   }
@@ -291,7 +296,28 @@ function openAccount(id=null){const a=id?state.accounts.find(x=>x.id===id):null;
 function closeAccount(){$('accountDialog').close()}
 function readForm(){return{id:$('accountId').value||crypto.randomUUID(),name:$('accountName').value.trim(),category:$('category').value,type:$('accountType').value,purchaseDate:$('purchaseDate').value,firstPaymentDate:$('firstPaymentDate').value||$('purchaseDate').value,installments:Math.max(1,parseInt($('installments').value||'1',10)),installmentValue:toNumber($('installmentValue').value),fixedValue:toNumber($('fixedValue').value),cashValue:toNumber($('cashValue').value),hasDifferentFirst:$('hasDifferentFirst').checked,firstInstallmentValue:toNumber($('firstInstallmentValue').value)}}
 function updateSmartForm(){const type=$('accountType').value;document.querySelectorAll('.installment-only').forEach(el=>el.classList.toggle('hidden',type!=='installment'));document.querySelectorAll('.fixed-only').forEach(el=>el.classList.toggle('hidden',type!=='fixed'));document.querySelectorAll('.installment-or-single').forEach(el=>el.classList.toggle('hidden',type==='fixed'));$('firstValueWrap').classList.toggle('hidden',!$('hasDifferentFirst').checked||type!=='installment');const temp=readForm();const total=accountTotalPaid(temp);const end=temp.type==='installment'?addMonthsSafe(temp.firstPaymentDate||temp.purchaseDate,(temp.installments||1)-1):null;const info=interestInfo(temp);$('calcPreview').innerHTML=temp.type==='fixed'?`Conta fixa mensal de <b>${money(temp.fixedValue)}</b>, iniciando em <b>${formatDate(parseDate(temp.purchaseDate))}</b>.`:`Total previsto: <b>${money(total)}</b>${end?`<br>Última parcela prevista: <b>${formatDate(end)}</b>`:''}${info?`<br>Juros estimados: <b>${money(info.interest)}</b> / <b>${info.totalPercent.toFixed(2)}%</b> sobre o valor à vista.`:''}`}
-function saveAccount(e){e.preventDefault();const account=readForm();if(!account.name)return;const idx=state.accounts.findIndex(a=>a.id===account.id);if(idx>=0)state.accounts[idx]=account;else state.accounts.push(account);saveState();closeAccount();render()}
+function saveAccount(e){
+  if(e) e.preventDefault();
+  try{
+    const account=readForm();
+    if(!account.name){$('accountName').focus();return;}
+    if(account.type==='fixed' && account.fixedValue<=0){$('fixedValue').focus();alert('Informe o valor mensal da conta.');return;}
+    if(account.type!=='fixed' && account.installmentValue<=0){$('installmentValue').focus();alert('Informe o valor da conta/parcela.');return;}
+    if(account.type==='installment' && (!account.installments || account.installments<1)) account.installments=1;
+    const idx=state.accounts.findIndex(a=>a.id===account.id);
+    if(idx>=0) state.accounts[idx]=account; else state.accounts.push(account);
+    activeCategory='Todas';
+    const refDate=parseDate(account.firstPaymentDate||account.purchaseDate);
+    if(refDate) viewDate=new Date(refDate.getFullYear(),refDate.getMonth(),1);
+    saveState();
+    localStorage.setItem(STORE,JSON.stringify(state));
+    closeAccount();
+    render();
+  }catch(err){
+    console.error('Erro ao salvar conta:',err);
+    alert('Não consegui salvar a conta. Verifique os campos e tente novamente.');
+  }
+}
 function deleteAccount(){const id=$('accountId').value;state.accounts=state.accounts.filter(a=>a.id!==id);saveState();closeAccount();render()}
 
 function fillSalaryFields(prefix, salary){
@@ -449,6 +475,16 @@ function importData(file){if(!file)return;const r=new FileReader();r.onload=()=>
 populateCategories();
 $('prevMonthBtn').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()-1,1);pickerYear=viewDate.getFullYear();render()};
 $('nextMonthBtn').onclick=()=>{viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+1,1);pickerYear=viewDate.getFullYear();render()};
+// V6.5 - botões de mês do layout mobile separados do desktop
+function changeMonth(delta){
+  viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+delta,1);
+  pickerYear=viewDate.getFullYear();
+  activeCategory='Todas';
+  render();
+}
+document.getElementById('mPrevMonthBtn')?.addEventListener('click',()=>changeMonth(-1));
+document.getElementById('mNextMonthBtn')?.addEventListener('click',()=>changeMonth(1));
+document.getElementById('mMonthSwitchLabel')?.addEventListener('click',()=>document.getElementById('monthPickerBtn')?.click());
 $('monthPickerBtn').onclick=()=>$('monthPicker').classList.toggle('hidden');$('yearDownBtn').onclick=()=>{pickerYear--;renderMonthGrid()};$('yearUpBtn').onclick=()=>{pickerYear++;renderMonthGrid()};
 $('openAccountBtn').onclick=()=>openAccount();$('closeAccountBtn').onclick=closeAccount;$('cancelAccountBtn').onclick=closeAccount;$('accountForm').onsubmit=saveAccount;$('deleteAccountBtn').onclick=deleteAccount;
 $('openSettingsBtn').onclick=openSettings;$('closeSettingsBtn').onclick=()=>$('settingsDialog').close();$('cancelSettingsBtn').onclick=()=>$('settingsDialog').close();$('settingsForm').onsubmit=saveSettings;

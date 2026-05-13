@@ -372,3 +372,10 @@ html[data-theme="blue"]{--accent:#60a5fa;--accent-2:#7dd3fc}html[data-theme="gre
     line-height:1.35;
   }
 }
+
+/* V6.4 - contas salvas também aparecem no mobile mesmo quando são futuras/finalizadas */
+@media (max-width:760px){
+  .m-list-subtitle{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin:14px 2px 6px}
+  .m-bill-card.muted-card{background:rgba(15,23,42,.72);border-style:dashed}
+  .m-bill-card.muted-card small{color:#94a3b8}
+}
